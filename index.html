@@ -6,7 +6,6 @@
   <title>طلب وسائل الإيضاح</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-   
     /* Loader styling */
     #loader {
       position: fixed;
@@ -93,6 +92,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      animation: slideIn 1s ease-out;
     }
 
     .logo img {
@@ -124,6 +124,7 @@
       border: 1px solid rgba(224, 46, 46, 0.2);
       margin-top: 150px;
       text-align: center;
+      animation: slideUp 1s ease-out;
     }
 
     .form-group {
@@ -145,13 +146,14 @@
       background: rgba(168, 60, 60, 0.2);
       color: #fff;
       font-size: 16px;
-      transition: 0.3s;
+      transition: all 0.3s ease;
     }
 
     input:focus, select:focus {
       border-color: #00c6ff;
       box-shadow: 0 0 10px rgba(0, 198, 255, 0.8);
       outline: none;
+      transform: scale(1.05); /* تكبير المربع عند التركيز */
     }
 
     .checkbox-group {
@@ -196,14 +198,24 @@
       to { top: 20px; opacity: 1; }
     }
 
-    @keyframes shake {
-      0% { transform: translateX(-50%); }
-      25% { transform: translateX(-55%); }
-      50% { transform: translateX(-45%); }
-      75% { transform: translateX(-55%); }
-      100% { transform: translateX(-50%); }
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
-  
+
+    @keyframes shake {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      25% { transform: translateX(-55%) rotate(5deg); }
+      50% { transform: translateX(-45%) rotate(-5deg); }
+      75% { transform: translateX(-55%) rotate(5deg); }
+      100% { transform: translateX(-50%) rotate(0deg); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -313,6 +325,12 @@
         return;
       }
 
+      // تحويل الوقت إلى صباحًا أو مساءً
+      const time = requestData.time;
+      const [hours, minutes] = time.split(':');
+      const period = hours >= 12 ? 'مساءً' : 'صَباحًا';
+      const formattedTime = `${time} ${period}`;
+
       // بناء نص الرسالة بشكل جميل
       const message = `🌟 *طلب جديد لوسائل الإيضاح* 🌟
       
@@ -322,33 +340,25 @@
 📍 *مكان الخدمة:* ${requestData.location}
 📱 *رقم التواصل:* ${requestData.whatsapp}
 🗓 *يوم الخدمة:* ${requestData.day}
-⏰ *وقت الخدمة:* ${requestData.time}
+⏰ *وقت الخدمة:* ${formattedTime}
 🎧 *المعدات المطلوبة:* ${requestData.equipment.join('، ') || "لا يوجد"}
 📝 *ملاحظات إضافية:* ${requestData.other || "لا يوجد"}
 
 شكرًا لكم! 🙏`;
 
-      // تشفير النص للرابط
-      const encodedMessage = encodeURIComponent(message);
+      // عرض رسالة التأكيد أولاً
+      showConfirmation('جاري إرسال الطلب...');
 
-      // الأرقام المستهدفة
-      const targetNumbers = [
-        '201280440587', // الرقم الأول
-        '201040695692'  // الرقم الثاني
-      ];
-
-      // إرسال الرسالة إلى كل رقم
-      targetNumbers.forEach(number => {
-        const whatsappUrl = `https://wa.me/${number}?text=${encodedMessage}`;
+      // بعد ثانيتين، إرسال الرسالة إلى الواتساب
+      setTimeout(() => {
+        const encodedMessage = encodeURIComponent(message);
+        const targetNumber = '201280440587'; // الرقم المستهدف
+        const whatsappUrl = `https://wa.me/${targetNumber}?text=${encodedMessage}`;
         window.open(whatsappUrl, '_blank');
-      });
-
-      // عرض تأكيد الإرسال
-      showConfirmation();
-      document.querySelector('form').reset();
+      }, 2000);
     });
 
-    function showConfirmation() {
+    function showConfirmation(message) {
       const div = document.createElement('div');
       div.style.cssText = `
         position: fixed;
@@ -360,10 +370,10 @@
         padding: 15px 30px;
         border-radius: 8px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        animation: slideIn 0.3s ease-out;
+        animation: slideIn 0.3s ease-out, shake 0.5s ease-in-out;
       `;
       
-      div.innerHTML = `تم إرسال الطلب بنجاح!`;
+      div.innerHTML = message;
       
       document.body.appendChild(div);
       
@@ -383,6 +393,7 @@
         padding: 15px 30px;
         border-radius: 8px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        animation: slideIn 0.3s ease-out, shake 0.5s ease-in-out;
       `;
       div.textContent = message;
       document.body.appendChild(div);
