@@ -6,6 +6,7 @@
   <title>طلب وسائل الإيضاح</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+   
     /* Loader styling */
     #loader {
       position: fixed;
@@ -202,6 +203,7 @@
       75% { transform: translateX(-55%); }
       100% { transform: translateX(-50%); }
     }
+  
   </style>
 </head>
 <body>
@@ -237,12 +239,12 @@
     <div class="form-group">
       <label for="service-location">مكان الخدمة</label>
       <input type="text" id="service-location" placeholder="اكتب مكان الخدمة هنا">
-    </div><div class="form-group">
-
-      <label for="service-location">رقم للوتساب </label>
-      <input type="text" id="service-location" placeholder="اكتب رقم للتواصل عبر الوتساب">
     </div>
-
+    
+    <div class="form-group">
+      <label for="whatsapp">رقم للوتساب </label>
+      <input type="text" id="whatsapp" placeholder="اكتب رقم للتواصل عبر الوتساب">
+    </div>
 
     <div class="form-group">
       <label for="service-day">يوم الخدمة</label>
@@ -286,7 +288,7 @@
       setTimeout(() => {
         loader.style.opacity = '0';
         setTimeout(() => loader.remove(), 1000);
-      }, 3000); // تم تمديد الوقت إلى 3 ثوانٍ
+      }, 3000);
     });
 
     // Form submission
@@ -297,6 +299,7 @@
         leader: document.getElementById('service-leader').value,
         serviceName: document.getElementById('service-name').value,
         location: document.getElementById('service-location').value,
+        whatsapp: document.getElementById('whatsapp').value,
         day: document.getElementById('service-day').value,
         time: document.getElementById('service-time').value,
         equipment: Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
@@ -304,12 +307,43 @@
         other: document.getElementById('other-request').value
       };
 
-      if(!requestData.leader || !requestData.serviceName || !requestData.location) {
+      // التحقق من الحقول المطلوبة
+      if (!requestData.leader || !requestData.serviceName || !requestData.location || !requestData.whatsapp) {
         showError('يرجى ملء جميع الخانات المطلوبة');
         return;
       }
 
-      console.log('طلب جديد:', requestData);
+      // بناء نص الرسالة بشكل جميل
+      const message = `🌟 *طلب جديد لوسائل الإيضاح* 🌟
+      
+📌 *تفاصيل الطلب:*
+🔖 *اسم أمين الخدمة:* ${requestData.leader}
+🏷 *اسم الخدمة:* ${requestData.serviceName}
+📍 *مكان الخدمة:* ${requestData.location}
+📱 *رقم التواصل:* ${requestData.whatsapp}
+🗓 *يوم الخدمة:* ${requestData.day}
+⏰ *وقت الخدمة:* ${requestData.time}
+🎧 *المعدات المطلوبة:* ${requestData.equipment.join('، ') || "لا يوجد"}
+📝 *ملاحظات إضافية:* ${requestData.other || "لا يوجد"}
+
+شكرًا لكم! 🙏`;
+
+      // تشفير النص للرابط
+      const encodedMessage = encodeURIComponent(message);
+
+      // الأرقام المستهدفة
+      const targetNumbers = [
+        '201280440587', // الرقم الأول
+        '201040695692'  // الرقم الثاني
+      ];
+
+      // إرسال الرسالة إلى كل رقم
+      targetNumbers.forEach(number => {
+        const whatsappUrl = `https://wa.me/${number}?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
+      });
+
+      // عرض تأكيد الإرسال
       showConfirmation();
       document.querySelector('form').reset();
     });
@@ -329,10 +363,7 @@
         animation: slideIn 0.3s ease-out;
       `;
       
-      div.innerHTML = `
-        <span style="margin-left: 10px;">✓</span>
-        تم إرسال الطلب بنجاح!
-      `;
+      div.innerHTML = `تم إرسال الطلب بنجاح!`;
       
       document.body.appendChild(div);
       
@@ -340,9 +371,6 @@
     }
 
     function showError(message) {
-      const existingError = document.querySelector('.error-message');
-      if(existingError) existingError.remove();
-      
       const div = document.createElement('div');
       div.className = 'error-message';
       div.style.cssText = `
@@ -355,26 +383,12 @@
         padding: 15px 30px;
         border-radius: 8px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        animation: shake 0.4s ease;
       `;
-      
       div.textContent = message;
       document.body.appendChild(div);
       
       setTimeout(() => div.remove(), 3000);
     }
-
-    const submitBtn = document.getElementById('submit-button');
-    
-    submitBtn.addEventListener('mousedown', () => {
-      submitBtn.style.transform = 'translateY(0)';
-      submitBtn.style.opacity = '0.9';
-    });
-    
-    submitBtn.addEventListener('mouseup', () => {
-      submitBtn.style.transform = 'translateY(-2px)';
-      submitBtn.style.opacity = '1';
-    });
   </script>
 </body>
 </html>
