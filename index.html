@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>كنيسة مارمينا العجايبي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -18,6 +18,7 @@
             background: #0a192f;
             color: #fff;
             overflow-x: hidden;
+            line-height: 1.6;
         }
 
         /* شاشة التحميل */
@@ -76,6 +77,7 @@
             align-items: center;
             transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 999;
+            padding: 15px;
         }
 
         .splash-screen.hidden {
@@ -83,12 +85,13 @@
         }
 
         .church-logo {
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             border: 3px solid #64ffda;
             box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+            object-fit: cover;
         }
 
         .splash-text {
@@ -97,15 +100,27 @@
             animation: fadeInUp 1s 0.5s forwards;
         }
 
+        .splash-text h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .splash-text h2 {
+            font-size: 1.2rem;
+            color: #8892b0;
+        }
+
         .swipe-up {
             position: absolute;
-            bottom: 2rem;
+            bottom: 1rem;
             animation: bounceArrow 2s infinite;
+            font-size: 0.9rem;
+            color: #64ffda;
         }
 
         /* الهيدر */
         header {
-            padding: 2rem;
+            padding: 1.5rem;
             text-align: center;
             opacity: 0;
             transform: translateY(20px);
@@ -113,11 +128,10 @@
         }
 
         .social-links {
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
             display: flex;
+            justify-content: center;
             gap: 1.5rem;
+            margin: 1.5rem 0;
             opacity: 0;
             animation: fadeIn 1s 1s forwards;
         }
@@ -126,6 +140,7 @@
             color: #64ffda;
             font-size: 1.5rem;
             transition: transform 0.3s;
+            text-decoration: none;
         }
 
         .social-links a:hover {
@@ -134,7 +149,7 @@
 
         /* الأزرار */
         .buttons {
-            padding: 2rem;
+            padding: 1.5rem;
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 0.8s 1s forwards;
@@ -146,13 +161,13 @@
         .btn {
             width: 100%;
             max-width: 400px;
-            margin: 1rem auto;
-            padding: 1.5rem;
+            margin: 0.8rem 0;
+            padding: 1.2rem;
             background: rgba(100, 255, 218, 0.1);
             border: 2px solid #64ffda;
             border-radius: 10px;
             color: #64ffda;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s;
             opacity: 0;
@@ -168,6 +183,54 @@
             color: #0a192f;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        /* Media Queries للجوال */
+        @media (max-width: 768px) {
+            .church-logo {
+                width: 100px;
+                height: 100px;
+            }
+
+            .splash-text h1 {
+                font-size: 1.5rem;
+            }
+
+            .splash-text h2 {
+                font-size: 1rem;
+            }
+
+            header h1 {
+                font-size: 1.2rem;
+            }
+
+            .btn {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .social-links {
+                gap: 1rem;
+                margin-right: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .splash-screen {
+                padding: 10px;
+            }
+
+            .swipe-up {
+                font-size: 0.8rem;
+            }
+
+            .social-links a {
+                font-size: 1.2rem;
+            }
+
+            .buttons {
+                padding: 1rem;
+            }
         }
 
         /* Animations */
@@ -219,11 +282,11 @@
             <a href="https://www.facebook.com/YourPage" target="_blank"><i class="fab fa-facebook"></i></a>
             <a href="https://wa.me/20123456789" target="_blank"><i class="fab fa-whatsapp"></i></a>
         </div>
-        <h1>خدمه من القلب للقلب ❤️</h1>
+        <h1>خدمه من القلب لي القلب ❤️</h1>
     </header>
 
     <div class="buttons">
-        <button class="btn" onclick="window.location.href='p1.html'">خدمة وسائل الإيضاح</button>
+        <button class="btn" onclick="window.location.href='service.html'">خدمة وسائل الإيضاح</button>
         <button class="btn" onclick="window.location.href='reservation.html'">حجز الاعترافات</button>
         <button class="btn" onclick="window.location.href='events.html'">المناسبات والمواعيد</button>
     </div>
