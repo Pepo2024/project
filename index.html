@@ -192,7 +192,7 @@
           opacity: 0;
           transform: translateY(20px);
           animation: fadeInUp 0.8s 0.5s forwards;
-          margin-top: 50px; /* تم إضافة هذا السطر لنزول العبارة إلى الأسفل */
+          margin-top: 50px; /* نزول العبارة إلى الأسفل */
       }
       header h1 {
           font-size: 2.2rem;
@@ -383,7 +383,7 @@
     </div>
 
     <script>
-        // إخفاء شاشة التحميل
+        // إخفاء شاشة التحميل بعد ثانيتين
         setTimeout(() => {
             document.querySelector('.loader').classList.add('hidden');
         }, 2000);
@@ -410,7 +410,7 @@
             splash.classList.add('hidden');
         });
 
-        // نظام الآيات
+        // نظام الآيات مع تبديل الرسائل كل دقيقة (60000 مللي ثانية)
         const verses = [
             "«إِنَّ إِلهَ السَّمَاءِ يُعْطِينَا النَّجَاحَ، وَنَحْنُ عَبِيدُهُ نَقُومُ وَنَبْنِي» (نحميا 2: 20)",
             "«أَمَّا الْحِكْمَةُ فَنَافِعَةٌ لِلإِنْجَاحِ» (الجامعة 10: 10)",
@@ -426,10 +426,11 @@
             content.textContent = verses[currentVerse];
             modal.classList.add('active');
             
+            // تغيير الرسالة كل 60000 مللي ثانية (أي كل دقيقة)
             verseInterval = setInterval(() => {
                 currentVerse = (currentVerse + 1) % verses.length;
                 content.textContent = verses[currentVerse];
-            }, 60000);
+            }, 6000);
         }
         function closeModal() {
             const modal = document.getElementById('verseModal');
@@ -496,8 +497,7 @@
             isDragging = false;
         }
 
-        // عند النقر على الكرة، يتم التحقق من حالة نافذة الآية:
-        // إذا كانت مفتوحة يتم إغلاقها، وإذا كانت مغلقة يتم فتحها.
+        // عند النقر على الكرة، إذا لم يكن السحب جارياً يتم فتح/إغلاق نافذة الآية
         draggableButton.addEventListener('click', function(e) {
             if (!isDragging) {
                 const modal = document.getElementById('verseModal');
