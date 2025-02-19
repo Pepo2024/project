@@ -111,6 +111,7 @@
         .splash-text {
             text-align: center;
             opacity: 0;
+            margin-bottom: 5%;
             animation: fadeInUp 1s 0.5s forwards;
         }
 
@@ -122,7 +123,7 @@
 
         /* الهيدر */
         header {
-            padding: 2rem 1rem;
+            padding: 1rem;
             text-align: center;
             opacity: 0;
             transform: translateY(20px);
@@ -164,13 +165,13 @@
 
         .btn {
             width: 100%;
-            margin: 0.75rem 0;
-            padding: 1.2rem;
+            margin: 0.5rem 0;
+            padding: 1rem;
             background: rgba(100, 255, 218, 0.1);
             border: 2px solid #64ffda;
             border-radius: 10px;
             color: #64ffda;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.3s;
             opacity: 0;
@@ -237,41 +238,113 @@
             }
 
             .btn {
-                padding: 1.5rem;
+                padding: 1.3rem;
                 font-size: 1.1rem;
             }
 
             header {
-                padding: 3rem;
-            }
-
-            .buttons {
                 padding: 2rem;
             }
         }
 
         @media (max-width: 480px) {
             .church-logo {
-                width: 120px;
-                height: 120px;
-                margin-top: 10vh;
+                width: 130px;
+                height: 130px;
+                margin-top: 20vh;
             }
 
             .splash-text h1 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
 
             .splash-text h2 {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
 
             .btn {
-                padding: 1rem;
+                padding: 0.9rem;
                 font-size: 0.9rem;
+                margin: 0.3rem 0;
             }
 
             .social-links {
                 gap: 1rem;
+            }
+
+            header {
+                padding: 0.5rem;
+            }
+
+            .buttons {
+                padding: 0.5rem;
+            }
+
+            .swipe-up {
+                margin-bottom: 10px;
+            }
+
+            .splash-text {
+                margin-bottom: 15%;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .church-logo {
+                width: 110px;
+                height: 110px;
+            }
+
+            .splash-text h1 {
+                font-size: 1.2rem;
+            }
+
+            .splash-text h2 {
+                font-size: 1rem;
+            }
+
+            .btn {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* شريط الاتصال */
+        .contact-bar {
+            background: #112240;
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 2px solid #64ffda; 
+            margin-top: 35%;
+        }
+
+        .contact-content {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #64ffda;
+            font-size: 0.9rem;
+        }
+
+        .contact-item a {
+            color: #64ffda;
+            text-decoration: none;
+        }
+
+        @media (max-width: 480px) {
+            .contact-content {
+                gap: 1rem;
+                flex-direction: column;
+            }
+
+            .contact-item {
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -316,6 +389,23 @@
         <button class="btn" onclick="window.location.href='events.html'">المناسبات والمواعيد</button>
     </div>
 
+ <!-- شريط الاتصال -->
+    <div class="contact-bar">
+        <div class="contact-content">
+            <div class="contact-item">
+                <i class="fab fa-facebook"></i>
+                <a href="https://www.facebook.com/YourPage" target="_blank">صفحة الفيسبوك</a>
+            </div>
+            <div class="contact-item">
+                <i class="fab fa-youtube"></i>
+                <a href="https://youtube.com/channel/..." target="_blank">قناة اليوتيوب</a>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <a href="tel:01280440587">01280440587</a>
+            </div>
+        </div>
+    </div>
 
     <script>
         // إخفاء شاشة التحميل بعد 2 ثانية
@@ -352,5 +442,4 @@
         });
     </script>
 </body>
-
 </html>
