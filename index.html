@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>كنيسة مارمينا العجايبي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* التصميم العام */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a192f;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* شاشة التحميل */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #0a192f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 12px;
+        }
+
+        .dot {
+            width: 20px;
+            height: 20px;
+            background: #64ffda;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .dot:nth-child(4) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-30px);
+            }
+        }
+
+        /* شاشة البداية */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #112240;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+        }
+
+        .splash-screen.hidden {
+            transform: translateY(-100%);
+        }
+
+        .church-logo {
+            width: 150px;
+            height: 150px;
+            border-radius: 40%;
+            box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+            margin-top: 15vh;
+        }
+
+        .splash-text {
+            text-align: center;
+            opacity: 0;
+            margin-bottom: 5%;
+            animation: fadeInUp 1s 0.5s forwards;
+        }
+
+        .swipe-up {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: bounceArrow 2s infinite;
+        }
+
+        /* الهيدر */
+        header {
+            padding: 1rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 0.5s forwards;
+            position: relative;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            opacity: 0;
+            animation: fadeIn 1s 1s forwards;
+        }
+
+        .social-links a {
+            color: #64ffda;
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px);
+        }
+
+        /* الأزرار */
+        .buttons {
+            padding: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 1s forwards;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .btn {
+            width: 100%;
+            margin: 0.5rem 0;
+            padding: 1rem;
+            background: rgba(100, 255, 218, 0.1);
+            border: 2px solid #64ffda;
+            border-radius: 10px;
+            color: #64ffda;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .btn:nth-child(1) {
+            animation: fadeInUp 0.6s 1.2s forwards;
+        }
+
+        .btn:nth-child(2) {
+            animation: fadeInUp 0.6s 1.4s forwards;
+        }
+
+        .btn:nth-child(3) {
+            animation: fadeInUp 0.6s 1.6s forwards;
+        }
+
+        .btn:hover {
+            background: #64ffda;
+            color: #0a192f;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes bounceArrow {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-20px);
+            }
+
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Media Queries */
+        @media (min-width: 768px) {
+            .church-logo {
+                width: 200px;
+                height: 200px;
+            }
+
+            .btn {
+                padding: 1.3rem;
+                font-size: 1.1rem;
+            }
+
+            header {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .church-logo {
+                width: 130px;
+                height: 130px;
+                margin-top: 20vh;
+            }
+
+            .splash-text h1 {
+                font-size: 1.4rem;
+            }
+
+            .splash-text h2 {
+                font-size: 1.1rem;
+            }
+
+            .btn {
+                padding: 0.9rem;
+                font-size: 0.9rem;
+                margin: 0.3rem 0;
+            }
+
+            .social-links {
+                gap: 1rem;
+            }
+
+            header {
+                padding: 0.5rem;
+            }
+
+            .buttons {
+                padding: 0.5rem;
+            }
+
+            .swipe-up {
+                margin-bottom: 10px;
+            }
+
+            .splash-text {
+                margin-bottom: 15%;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .church-logo {
+                width: 110px;
+                height: 110px;
+            }
+
+            .splash-text h1 {
+                font-size: 1.2rem;
+            }
+
+            .splash-text h2 {
+                font-size: 1rem;
+            }
+
+            .btn {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* شريط الاتصال */
+        .contact-bar {
+            background: #112240;
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 2px solid #64ffda; 
+            margin-top: 35%;
+        }
+
+        .contact-content {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #64ffda;
+            font-size: 0.9rem;
+        }
+
+        .contact-item a {
+            color: #64ffda;
+            text-decoration: none;
+        }
+
+        @media (max-width: 480px) {
+            .contact-content {
+                gap: 1rem;
+                flex-direction: column;
+            }
+
+            .contact-item {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- شاشة التحميل -->
+    <div class="loader">
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <!-- شاشة البداية -->
+    <div class="splash-screen">
+        <img src="mina.jpg" class="church-logo" alt="شعار الكنيسة">
+        <div class="splash-text">
+            <h1>St. Mina's Church</h1>
+            <h2>كنيسة مارمينا العجايبي</h2>
+        </div>
+        <div class="swipe-up">
+            <i class="fas fa-arrow-up"></i>
+            <p>اسحب للأعلى للدخول</p>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <header>
+        <h1>خدمه من القلب للقلب ❤️</h1>
+        <div class="social-links">
+            <a href="https://www.facebook.com/YourPage" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://wa.me/20123456789" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        </div>
+    </header>
+
+    <div class="buttons">
+        <button class="btn" onclick="window.location.href='service.html'">خدمة وسائل الإيضاح</button>
+        <button class="btn" onclick="window.location.href='reservation.html'">حجز الاعترافات</button>
+        <button class="btn" onclick="window.location.href='events.html'">المناسبات والمواعيد</button>
+    </div>
+
+ <!-- شريط الاتصال -->
+    <div class="contact-bar">
+        <div class="contact-content">
+            <div class="contact-item">
+                <i class="fab fa-facebook"></i>
+                <a href="https://www.facebook.com/YourPage" target="_blank">صفحة الفيسبوك</a>
+            </div>
+            <div class="contact-item">
+                <i class="fab fa-youtube"></i>
+                <a href="https://youtube.com/channel/..." target="_blank">قناة اليوتيوب</a>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <a href="tel:01280440587">01280440587</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // إخفاء شاشة التحميل بعد 2 ثانية
+        setTimeout(() => {
+            document.querySelector('.loader').classList.add('hidden');
+        }, 2000);
+
+        // التحكم في شاشة البداية
+        let startY = 0;
+        const splash = document.querySelector('.splash-screen');
+
+        // للشاشات التي تعمل باللمس
+        document.addEventListener('touchstart', e => {
+            startY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchmove', e => {
+            const currentY = e.touches[0].clientY;
+            if (startY - currentY > 50) {
+                splash.classList.add('hidden');
+            }
+        });
+
+        // للشاشات العادية (ماوس/تاتشباد)
+        document.addEventListener('wheel', e => {
+            if (e.deltaY < 0) {
+                splash.classList.add('hidden');
+            }
+        });
+
+        // كليك كبديل
+        splash.addEventListener('click', () => {
+            splash.classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
