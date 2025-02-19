@@ -1,277 +1,327 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>كنيسة مارمينا العجايبي</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* التصميم العام المعدل */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a192f;
-            color: #fff;
-            overflow-x: hidden;
-            font-size: 20px;
-        }
-
-        /* شاشة التحميل */
-        .loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: #0a192f;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s;
-        }
-
-        .loader.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .loading-dots {
-            display: flex;
-            gap: 15px;
-        }
-
-        .dot {
-            width: 30px;
-            height: 30px;
-            background: #64ffda;
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out;
-        }
-
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-        .dot:nth-child(4) { animation-delay: 0.6s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-40px); }
-        }
-
-        /* شاشة البداية */
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: #112240;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 999;
-            padding: 20px;
-        }
-
-        .splash-screen.hidden {
-            transform: translateY(-100%);
-        }
-
-        .church-logo {
-            width: 320px;
-            height: 320px;
-            border-radius: 40%;
-            box-shadow: 0 0 30px rgba(100, 255, 218, 0.4);
-            margin: 20px 0;
-            object-fit: cover;
-        }
-
-        .splash-text {
-            text-align: center;
-            opacity: 0;
-            animation: fadeInUp 1s 0.5s forwards;
-        }
-
-        .splash-text h1 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-
-        .splash-text h2 {
-            font-size: 2rem;
-        }
-
-        .swipe-up {
-            text-align: center;
-            margin-top: 40px;
-            animation: bounceArrow 2s infinite;
-            font-size: 1.5rem;
-        }
-
-        /* الهيدر */
-        header {
-            padding: 2rem 1rem;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.8s 0.5s forwards;
-        }
-
-        header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            opacity: 0;
-            animation: fadeIn 1s 1s forwards;
-        }
-
-        .social-links a {
-            color: #64ffda;
-            font-size: 2.5rem;
-            transition: transform 0.3s;
-        }
-
-        /* الأزرار */
-        .buttons {
-            padding: 1.5rem;
-            max-width: 800px;
-            margin: 0 auto;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.8s 1s forwards;
-        }
-
-        .btn {
-            width: 100%;
-            margin: 20px 0;
-            padding: 2rem;
-            background: rgba(100, 255, 218, 0.1);
-            border: 3px solid #64ffda;
-            border-radius: 15px;
-            color: #64ffda;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        .btn:nth-child(1) { animation: fadeInUp 0.6s 1.2s forwards; }
-        .btn:nth-child(2) { animation: fadeInUp 0.6s 1.4s forwards; }
-        .btn:nth-child(3) { animation: fadeInUp 0.6s 1.6s forwards; }
-
-        .btn:hover {
-            background: #64ffda;
-            color: #0a192f;
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(100, 255, 218, 0.4);
-        }
-
-        /* شريط الاتصال */
-        .contact-bar {
-            background: #112240;
-            padding: 2rem;
-            text-align: center;
-            border-bottom: 3px solid #64ffda;
-            margin-top: 4rem;
-        }
-
-        .contact-content {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: #64ffda;
-            font-size: 1.3rem;
-        }
-
-        /* الأنيميشنات */
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        @keyframes bounceArrow {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-25px); }
-            60% { transform: translateY(-15px); }
-        }
-
-        /* التحكم بالاستجابة */
-        @media (max-width: 768px) {
-            .church-logo {
-                width: 280px;
-                height: 280px;
-            }
-
-            .splash-text h1 { font-size: 2.2rem; }
-            .splash-text h2 { font-size: 1.8rem; }
-
-            .btn {
-                padding: 1.8rem;
-                font-size: 1.3rem;
-            }
-
-            header h1 { font-size: 2rem; }
-        }
-
-        @media (max-width: 480px) {
-            body { font-size: 18px; }
-
-            .church-logo {
-                width: 240px;
-                height: 240px;
-            }
-
-            .splash-text h1 { font-size: 1.8rem; }
-            .splash-text h2 { font-size: 1.5rem; }
-
-            .btn {
-                padding: 1.5rem;
-                font-size: 1.2rem;
-            }
-
-            header h1 { font-size: 1.6rem; }
-            .social-links a { font-size: 2rem; }
-            .contact-item { font-size: 1.1rem; }
-        }
-
-        @media (max-width: 360px) {
-            .church-logo {
-                width: 200px;
-                height: 200px;
-            }
-
-            .splash-text h1 { font-size: 1.6rem; }
-            .splash-text h2 { font-size: 1.3rem; }
-
-            .btn { padding: 1.2rem; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>كنيسة مارمينا العجايبي</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+      /* التصميم العام المعدل */
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: #0a192f;
+          color: #fff;
+          overflow-x: hidden;
+          font-size: 20px;
+      }
+      
+      /* العنصر في أعلى اليمين للوغو والاسم */
+      .top-right-logo {
+          position: fixed;
+          top: 10px;
+          right: 10px;
+          display: flex;
+          align-items: center;
+          z-index: 1100;
+      }
+      .top-right-logo img {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          margin-left: 10px;
+      }
+      .top-right-logo span {
+          font-size: 1.2rem;
+          color: #64ffda;
+          font-weight: bold;
+      }
+      
+      /* شاشة التحميل */
+      .loader {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100vh;
+          background: #0a192f;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+          transition: opacity 0.5s;
+      }
+      .loader.hidden {
+          opacity: 0;
+          pointer-events: none;
+      }
+      .loading-dots {
+          display: flex;
+          gap: 15px;
+      }
+      .dot {
+          width: 30px;
+          height: 30px;
+          background: #64ffda;
+          border-radius: 50%;
+          animation: bounce 1.4s infinite ease-in-out;
+      }
+      .dot:nth-child(2) { animation-delay: 0.2s; }
+      .dot:nth-child(3) { animation-delay: 0.4s; }
+      .dot:nth-child(4) { animation-delay: 0.6s; }
+      @keyframes bounce {
+          0%, 80%, 100% { transform: translateY(0); }
+          40% { transform: translateY(-40px); }
+      }
+      
+      /* شاشة البداية */
+      .splash-screen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100vh;
+          background: #112240;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+          z-index: 999;
+          padding: 20px;
+      }
+      .splash-screen.hidden {
+          transform: translateY(-100%);
+      }
+      .church-logo {
+          width: 250px;
+          height: 250px;
+          border-radius: 40%;
+          box-shadow: 0 0 30px rgba(100, 255, 218, 0.4);
+          margin: 20px 0;
+          object-fit: cover;
+      }
+      .splash-text {
+          text-align: center;
+          opacity: 0;
+          animation: fadeInUp 1s 0.5s forwards;
+      }
+      .splash-text h1 {
+          font-size: 2rem;
+          margin-bottom: 15px;
+      }
+      .splash-text h2 {
+          font-size: 1.5rem;
+      }
+      .swipe-up {
+          text-align: center;
+          margin-top: 20px;
+          animation: bounceArrow 2s infinite;
+          font-size: 1.2rem;
+      }
+      
+      /* الدائرة القابلة للسحب والمتحركة */
+      .floating-button {
+          position: fixed;
+          width: 60px;
+          height: 60px;
+          background: #64ffda;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 4px 15px rgba(100, 255, 218, 0.4);
+          z-index: 1000;
+          user-select: none;
+          overflow: hidden;
+          transition: left 0.3s ease, top 0.3s ease;
+          animation: floatAnimation 3s ease-in-out infinite;
+      }
+      .floating-button img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          pointer-events: none;
+      }
+      @keyframes floatAnimation {
+          0% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+          100% { transform: translateY(0); }
+      }
+      
+      /* نافذة الآيات */
+      .verse-modal {
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: #112240;
+          padding: 2rem;
+          border-radius: 15px;
+          max-width: 90%;
+          width: 400px;
+          text-align: center;
+          border: 2px solid #64ffda;
+          z-index: 1001;
+      }
+      .verse-modal.active {
+          display: block;
+          animation: fadeIn 0.3s;
+      }
+      .verse-content {
+          font-size: 1.2rem;
+          line-height: 1.6;
+          margin-bottom: 1.5rem;
+      }
+      .close-btn {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          color: #64ffda;
+          cursor: pointer;
+          font-size: 1.5rem;
+      }
+      
+      /* المحتوى الرئيسي */
+      header {
+          padding: 2rem 1rem;
+          text-align: center;
+          opacity: 0;
+          transform: translateY(20px);
+          animation: fadeInUp 0.8s 0.5s forwards;
+      }
+      header h1 {
+          font-size: 2.2rem;
+          margin-bottom: 1.5rem;
+      }
+      
+      .buttons {
+          padding: 1.5rem;
+          max-width: 800px;
+          margin: 0 auto;
+          opacity: 0;
+          transform: translateY(20px);
+          animation: fadeInUp 0.8s 1s forwards;
+      }
+      .btn {
+          width: 100%;
+          margin: 20px 0;
+          padding: 2rem;
+          background: rgba(100, 255, 218, 0.1);
+          border: 3px solid #64ffda;
+          border-radius: 15px;
+          color: #64ffda;
+          font-size: 1.5rem;
+          cursor: pointer;
+          transition: all 0.3s;
+          opacity: 0;
+          transform: translateY(20px);
+      }
+      .btn:nth-child(1) { animation: fadeInUp 0.6s 1.2s forwards; }
+      .btn:nth-child(2) { animation: fadeInUp 0.6s 1.4s forwards; }
+      .btn:nth-child(3) { animation: fadeInUp 0.6s 1.6s forwards; }
+      .btn:hover {
+          background: #64ffda;
+          color: #0a192f;
+          transform: translateY(-5px);
+          box-shadow: 0 8px 20px rgba(100, 255, 218, 0.4);
+      }
+      
+      .contact-bar {
+          background: #112240;
+          padding: 2rem;
+          text-align: center;
+          border-bottom: 3px solid #64ffda;
+          margin-top: 4rem;
+      }
+      .contact-content {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+      }
+      .contact-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          color: #64ffda;
+          font-size: 1.3rem;
+      }
+      
+      /* الأنيميشنات */
+      @keyframes fadeInUp {
+          to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+      }
+      @keyframes bounceArrow {
+          0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+          40% { transform: translateY(-25px); }
+          60% { transform: translateY(-15px); }
+      }
+      
+      /* التحكم بالاستجابة */
+      @media (max-width: 768px) {
+          .church-logo {
+              width: 220px;
+              height: 220px;
+          }
+          .splash-text h1 {
+              font-size: 1.8rem;
+          }
+          .splash-text h2 {
+              font-size: 1.4rem;
+          }
+          .btn {
+              padding: 1.8rem;
+              font-size: 1.3rem;
+          }
+          header h1 {
+              font-size: 2rem;
+          }
+      }
+      @media (max-width: 480px) {
+          body {
+              font-size: 18px;
+          }
+          .church-logo {
+              width: 200px;
+              height: 200px;
+          }
+          .splash-text h1 {
+              font-size: 1.6rem;
+          }
+          .splash-text h2 {
+              font-size: 1.2rem;
+          }
+          .btn {
+              padding: 1.5rem;
+              font-size: 1.1rem;
+          }
+          header h1 {
+              font-size: 1.6rem;
+          }
+          .contact-item {
+              font-size: 1.1rem;
+          }
+          .verse-content {
+              font-size: 1rem;
+          }
+      }
+  </style>
 </head>
 <body>
+    <!-- عنصر اللوغو والاسم في أعلى اليمين -->
+    <div class="top-right-logo">
+        <img src="mina.jpg" alt="شعار الكنيسة">
+        <span>St. Mina's Church</span>
+    </div>
+
     <!-- شاشة التحميل -->
     <div class="loader">
         <div class="loading-dots">
@@ -295,13 +345,20 @@
         </div>
     </div>
 
+    <!-- الدائرة القابلة للسحب والمتحركة -->
+    <div class="floating-button" id="draggableButton">
+        <img src="book1.jpg" alt="آية">
+    </div>
+
+    <!-- نافذة الآيات -->
+    <div class="verse-modal" id="verseModal">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div class="verse-content" id="verseContent"></div>
+    </div>
+
     <!-- المحتوى الرئيسي -->
     <header>
         <h1>خدمه من القلب للقلب ❤️</h1>
-        <div class="social-links">
-            <a href="https://www.facebook.com/YourPage" target="_blank"><i class="fab fa-facebook"></i></a>
-            <a href="https://wa.me/20123456789" target="_blank"><i class="fab fa-whatsapp"></i></a>
-        </div>
     </header>
 
     <div class="buttons">
@@ -313,10 +370,6 @@
     <!-- شريط الاتصال -->
     <div class="contact-bar">
         <div class="contact-content">
-            <div class="contact-item">
-                <i class="fab fa-facebook"></i>
-                <a href="https://www.facebook.com/YourPage" target="_blank">صفحة الفيسبوك</a>
-            </div>
             <div class="contact-item">
                 <i class="fab fa-youtube"></i>
                 <a href="https://youtube.com/channel/..." target="_blank">قناة اليوتيوب</a>
@@ -338,28 +391,121 @@
         let startY = 0;
         const splash = document.querySelector('.splash-screen');
 
-        // للشاشات التي تعمل باللمس
         document.addEventListener('touchstart', e => {
             startY = e.touches[0].clientY;
         });
-
         document.addEventListener('touchmove', e => {
             const currentY = e.touches[0].clientY;
             if (startY - currentY > 50) {
                 splash.classList.add('hidden');
             }
         });
-
-        // للشاشات العادية
         document.addEventListener('wheel', e => {
             if (e.deltaY < 0) {
                 splash.classList.add('hidden');
             }
         });
-
-        // كليك كبديل
         splash.addEventListener('click', () => {
             splash.classList.add('hidden');
+        });
+
+        // نظام الآيات
+        const verses = [
+            "«إِنَّ إِلهَ السَّمَاءِ يُعْطِينَا النَّجَاحَ، وَنَحْنُ عَبِيدُهُ نَقُومُ وَنَبْنِي» (نحميا 2: 20)",
+            "«أَمَّا الْحِكْمَةُ فَنَافِعَةٌ لِلإِنْجَاحِ» (الجامعة 10: 10)",
+            "«يَا سَيِّدُ، لِتَكُنْ أُذُنُكَ مُصْغِيَةً إِلَى صَلاَةِ عَبْدِكَ...» (نحميا 1: 11)",
+            "«رُبَّ نَجَاحٍ يَكُونُ لأَذَى صَاحِبِهِ!» (يشوع بن سيراخ 20: 9)",
+            "«بِهِ يُنْتَهَى إِلَى النَّجَاحِ، وَبِكَلِمَتِهِ يَقُومُ الْجَمِيعُ» (يشوع بن سيراخ 43: 28)"
+        ];
+        let currentVerse = 0;
+        let verseInterval;
+        function showVerse() {
+            const modal = document.getElementById('verseModal');
+            const content = document.getElementById('verseContent');
+            content.textContent = verses[currentVerse];
+            modal.classList.add('active');
+            
+            verseInterval = setInterval(() => {
+                currentVerse = (currentVerse + 1) % verses.length;
+                content.textContent = verses[currentVerse];
+            }, 60000);
+        }
+        function closeModal() {
+            const modal = document.getElementById('verseModal');
+            modal.classList.remove('active');
+            clearInterval(verseInterval);
+        }
+
+        // نظام السحب للكرة
+        const draggableButton = document.getElementById('draggableButton');
+        let isDragging = false;
+        let currentX = 20;
+        let currentY = 20;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        draggableButton.style.left = currentX + 'px';
+        draggableButton.style.top = currentY + 'px';
+
+        draggableButton.addEventListener('mousedown', dragStart);
+        draggableButton.addEventListener('touchstart', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('touchend', dragEnd);
+
+        function dragStart(e) {
+            if (e.type === 'touchstart') {
+                initialX = e.touches[0].clientX - xOffset;
+                initialY = e.touches[0].clientY - yOffset;
+            } else {
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+            }
+            isDragging = true;
+        }
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                if (e.type === 'touchmove') {
+                    currentX = e.touches[0].clientX - initialX;
+                    currentY = e.touches[0].clientY - initialY;
+                } else {
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                }
+                xOffset = currentX;
+                yOffset = currentY;
+                setTranslate(currentX, currentY, draggableButton);
+            }
+        }
+        function setTranslate(xPos, yPos, el) {
+            const maxX = window.innerWidth - el.offsetWidth;
+            const maxY = window.innerHeight - el.offsetHeight;
+            xPos = Math.min(Math.max(0, xPos), maxX);
+            yPos = Math.min(Math.max(0, yPos), maxY);
+            el.style.left = xPos + 'px';
+            el.style.top = yPos + 'px';
+        }
+        function dragEnd() {
+            initialX = currentX;
+            initialY = currentY;
+            isDragging = false;
+        }
+
+        // عند النقر على الكرة، يتم التحقق من حالة نافذة الآية:
+        // إذا كانت مفتوحة يتم إغلاقها، وإذا كانت مغلقة يتم فتحها.
+        draggableButton.addEventListener('click', function(e) {
+            if (!isDragging) {
+                const modal = document.getElementById('verseModal');
+                if(modal.classList.contains('active')){
+                    closeModal();
+                } else {
+                    showVerse();
+                }
+            }
         });
     </script>
 </body>
