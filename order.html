@@ -329,7 +329,7 @@
           
           // بعد ثانيتين، إرسال الرسالة إلى قائمة أرقام الواتساب
           setTimeout(function(){
-            const numbers = ['201280440587', '01040695692', '01205621745'];
+            const numbers = ['201280440587'];
             numbers.forEach(number => {
                 const whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
                 window.open(whatsappUrl, '_blank');
