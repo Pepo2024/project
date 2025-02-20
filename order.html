@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>طلب وسائل الإيضاح</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- تضمين مكتبات Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <style>
     /* Loader styling */
     #loader {
@@ -252,6 +255,18 @@
   </div>
 
   <script>
+    // --- تهيئة Firebase ---
+    // الصق هنا إعدادات firebaseConfig الخاصة بمشروعك
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4NiKlU6SIJVxbnbk60SkRt8BNqlonk-U",
+      authDomain: "mina-project-c10b2.firebaseapp.com",
+      projectId: "mina-project-c10b2",
+      storageBucket: "mina-project-c10b2.firebasestorage.app",
+      messagingSenderId: "1088494592963",
+      appId: "1:1088494592963:web:de6a787bc3b1694ccd1376"
+    };
+    firebase.initializeApp(firebaseConfig);
+
     // Loader functionality
     window.addEventListener('load', function() {
       const loader = document.getElementById('loader');
@@ -261,7 +276,7 @@
       }, 3000);
     });
 
-    // Form submission
+    // Form submission مع إرسال البيانات إلى Firebase
     document.getElementById('submit-button').addEventListener('click', function(e) {
       e.preventDefault();
       
@@ -283,21 +298,21 @@
         return;
       }
 
-      // تحويل الوقت إلى صباحًا أو مساءً
+      // تحويل الوقت إلى صباحًا أو مساءً إذا تم إدخاله
       if(requestData.time){
         const [hours, minutes] = requestData.time.split(':');
         const period = hours >= 12 ? 'مساءً' : 'صَباحًا';
         requestData.time = `${requestData.time} ${period}`;
       }
 
-      // حفظ الطلب في التخزين المحلي
-      let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-      orders.push(requestData);
-      localStorage.setItem('orders', JSON.stringify(orders));
-
-      // بناء نص الرسالة بشكل جميل
-      const message = `🌟 *طلب جديد لوسائل الإيضاح* 🌟
-      
+      // إرسال الطلب إلى Firebase بدلاً من التخزين المحلي
+      firebase.database().ref("orders").push(requestData, function(error) {
+        if (error) {
+          showError("حدث خطأ أثناء إرسال الطلب");
+        } else {
+          // بناء نص الرسالة بشكل جميل كما في النسخة الأصلية
+          const message = `🌟 *طلب جديد لوسائل الإيضاح* 🌟
+          
 📌 *تفاصيل الطلب:*
 🔖 *اسم أمين الخدمة:* ${requestData.leader}
 🏷 *اسم الخدمة:* ${requestData.serviceName}
@@ -310,20 +325,20 @@
 
 شكرًا لكم! 🙏`;
 
-      // عرض رسالة التأكيد أولاً
-      showConfirmation('جاري إرسال الطلب...');
+          showConfirmation('جاري إرسال الطلب...');
+          
+          // بعد ثانيتين، إرسال الرسالة إلى قائمة أرقام الواتساب
+          setTimeout(function(){
+            const numbers = ['201280440587', '01040695692', '01205621745'];
+            numbers.forEach(number => {
+                const whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            });
+          }, 2000);
 
-      // بعد ثانيتين، إرسال الرسالة إلى الواتساب
-      setTimeout(function(){
-        const numbers = ['201280440587', '01040695692', '01205621745']; // قائمة الأرقام
-        numbers.forEach(number => {
-            const whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-        });
-      }, 2000);
-
-      // إعادة تعيين النموذج
-      resetForm();
+          resetForm();
+        }
+      });
     });
 
     function showConfirmation(message) {
@@ -340,7 +355,6 @@
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         animation: slideIn 0.3s ease-out, shake 0.5s ease-in-out;
       `;
-      
       div.innerHTML = message;
       document.body.appendChild(div);
       setTimeout(() => div.remove(), 3000);
