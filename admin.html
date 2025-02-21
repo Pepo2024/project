@@ -193,7 +193,6 @@
         عدد الطلبات الحالية: <span id="count">0</span>
       </p>
       <div class="alert alert-error" id="error-message"></div>
-
       <div class="input-group">
         <input 
           type="password" 
@@ -205,12 +204,10 @@
           <i class="fas fa-eye"></i>
         </span>
       </div>
-
       <button class="btn-primary" id="login-button">
         دخول إلى لوحة التحكم
       </button>
     </div>
-
     <!-- واجهة الطلبات -->
     <div id="order-container" style="display:none;">
       <div class="orders-header">
@@ -220,7 +217,6 @@
       <div class="orders-list" id="orders"></div>
     </div>
   </div>
-
   <script>
     // --- تهيئة Firebase ---
     const firebaseConfig = {
@@ -237,6 +233,32 @@
     const errorMessage = document.getElementById('error-message');
     const orderCountSpan = document.getElementById('count');
     let attemptCount = 0; // عدد محاولات الدخول
+    const BAN_DURATION = 60000; // 60000 ثانية ملي 
+
+    // فحص حالة الحظر عند تحميل الصفحة باستخدام localStorage
+    function checkBanStatus() {
+      let bannedUntil = localStorage.getItem("bannedUntil");
+      if (bannedUntil) {
+        bannedUntil = parseInt(bannedUntil, 10);
+        const now = Date.now();
+        if (now < bannedUntil) {
+          // لا يزال المستخدم محظورًا
+          loginButton.disabled = true;
+          document.getElementById('password').disabled = true;
+          const remaining = bannedUntil - now;
+          showError("تم حظرك لمدة دقيقة بسبب محاولات خاطئة");
+          setTimeout(() => {
+            loginButton.disabled = false;
+            document.getElementById('password').disabled = false;
+            localStorage.removeItem("bannedUntil");
+            attemptCount = 0;
+          }, remaining);
+        } else {
+          localStorage.removeItem("bannedUntil");
+        }
+      }
+    }
+    checkBanStatus();
 
     // تحديث عدد الطلبات من Firebase
     function updateOrderCount() {
@@ -249,6 +271,7 @@
 
     loginButton.addEventListener('click', function() {
       const password = document.getElementById('password').value.trim();
+      // كلمة المرور الصحيحة هي "123"
       if (password === '123') {
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('order-container').style.display = 'block';
@@ -256,17 +279,19 @@
       } else {
         attemptCount++;
         if (attemptCount >= 3) {
-          showError('تم حظرك لمدة ساعه بسبب محاولات خاطئة');
-          // تعطيل الزر وحقل الإدخال
+          const banUntil = Date.now() + BAN_DURATION;
+          localStorage.setItem("bannedUntil", banUntil);
+          showError("تم حظرك لمدة دقيقة بسبب محاولات خاطئة");
           loginButton.disabled = true;
           document.getElementById('password').disabled = true;
           setTimeout(() => {
             attemptCount = 0;
             loginButton.disabled = false;
             document.getElementById('password').disabled = false;
-          }, 600000); // 60000 مللي ثانية = دقيقة واحدة
+            localStorage.removeItem("bannedUntil");
+          }, BAN_DURATION);
         } else {
-          showError('كلمة المرور غير صحيحة، الرجاء المحاولة مرة أخرى');
+          showError("كلمة المرور غير صحيحة، الرجاء المحاولة مرة أخرى");
         }
       }
     });
@@ -343,7 +368,7 @@
           });
           ordersDiv.innerHTML = ordersHTML;
         }
-        updateOrderCount(); // تحديث العدد بعد كل تغيير
+        updateOrderCount();
         // تفعيل خاصية السحب والحذف لكل بطاقة
         document.querySelectorAll('.order-card').forEach(card => {
           attachSwipeListener(card);
