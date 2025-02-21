@@ -350,6 +350,9 @@
       }
     }
 
+    // متغير لتحديد انتهاء تحميل الطلبات الأولية
+    let initialLoad = true;
+
     // تحميل الطلبات من Firebase وعرضها
     function loadOrders() {
       const ordersDiv = document.getElementById('orders');
@@ -407,6 +410,24 @@
         document.querySelectorAll('.order-card').forEach(card => {
           attachSwipeListener(card);
         });
+      });
+
+      // الاستماع لإضافة طلب جديد لإظهار إشعار
+      firebase.database().ref("orders").on("child_added", function(snapshot) {
+        // إذا لم يكن جزء التحميل الأولي
+        if (!initialLoad) {
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("طلب جديد", {
+              body: "لقد وصل طلب جديد. يرجى التحقق من لوحة التحكم.",
+              icon: "path/to/icon.png" // عدل مسار الأيقونة حسب الحاجة
+            });
+          }
+        }
+      });
+
+      // بعد تحميل الطلبات الأولية، ضبط initialLoad على false
+      firebase.database().ref("orders").once("value").then(function(snapshot) {
+        initialLoad = false;
       });
     }
 
@@ -486,6 +507,15 @@
           isDragging = false;
           card.style.transition = 'transform 0.3s ease';
           card.style.transform = 'translateX(0)';
+        }
+      });
+    }
+
+    // طلب إذن الإشعارات إذا كانت مدعومة
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          console.log("تم تفعيل الإشعارات");
         }
       });
     }
