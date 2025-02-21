@@ -14,8 +14,8 @@
       --primary-color: #2E86C1;
       --secondary-color: #F4F6F7;
       --text-color: #2C3E50;
-      --success-color: #28A745;
       --error-color: #E74C3C;
+      --success-color: #28a745;
       --card-bg: #FFFFFF;
       --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
@@ -157,17 +157,47 @@
       border-radius: 1rem;
       box-shadow: var(--shadow);
     }
-    /* رسائل التنبيه */
+    /* تنسيق رسائل التنبيه */
     .alert {
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin-bottom: 1rem;
-      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      z-index: 1000;
+      pointer-events: none;
     }
-    .alert-error {
-      background: #ffe3e3;
-      color: var(--error-color);
-      border: 1px solid #ffa8a8;
+    .alert.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* تنسيق الأخطاء باللون الأحمر مع اهتزاز */
+    .alert.error {
+      background-color: var(--error-color);
+      color: #fff;
+      animation: shake 0.5s;
+    }
+    /* تنسيق رسائل النجاح (عند فك الحظر) باللون الأخضر */
+    .alert.success {
+      background-color: var(--success-color);
+      color: #fff;
+    }
+    @keyframes shake {
+      0% { transform: translateX(-50%) translateX(0); }
+      10% { transform: translateX(-50%) translateX(-10px); }
+      20% { transform: translateX(-50%) translateX(10px); }
+      30% { transform: translateX(-50%) translateX(-10px); }
+      40% { transform: translateX(-50%) translateX(10px); }
+      50% { transform: translateX(-50%) translateX(-10px); }
+      60% { transform: translateX(-50%) translateX(10px); }
+      70% { transform: translateX(-50%) translateX(-10px); }
+      80% { transform: translateX(-50%) translateX(10px); }
+      90% { transform: translateX(-50%) translateX(-10px); }
+      100% { transform: translateX(-50%) translateX(0); }
     }
     @media (max-width: 768px) {
       .container { padding: 0 1rem; }
@@ -192,7 +222,8 @@
       <p id="order-count" style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary-color);">
         عدد الطلبات الحالية: <span id="count">0</span>
       </p>
-      <div class="alert alert-error" id="error-message"></div>
+      <!-- رسالة التنبيه (تظهر بخلفية حمراء أو خضراء بحسب الحالة) -->
+      <div class="alert" id="error-message"></div>
       <div class="input-group">
         <input 
           type="password" 
@@ -233,25 +264,35 @@
     const errorMessage = document.getElementById('error-message');
     const orderCountSpan = document.getElementById('count');
     let attemptCount = 0; // عدد محاولات الدخول
-    const BAN_DURATION = 60000; // 60000 ثانية ملي 
+    const BAN_DURATION = 60000; // مدة الحظر: دقيقة واحدة
 
-    // فحص حالة الحظر عند تحميل الصفحة باستخدام localStorage
+    // دالة عرض رسالة مع نوعها (error أو success)
+    function showMessage(message, type) {
+      errorMessage.textContent = message;
+      errorMessage.className = "alert show " + type;
+      setTimeout(() => {
+        errorMessage.classList.remove("show");
+      }, 3000);
+    }
+
+    // دالة لفحص حالة الحظر عند تحميل الصفحة باستخدام localStorage
     function checkBanStatus() {
       let bannedUntil = localStorage.getItem("bannedUntil");
       if (bannedUntil) {
         bannedUntil = parseInt(bannedUntil, 10);
         const now = Date.now();
         if (now < bannedUntil) {
-          // لا يزال المستخدم محظورًا
+          // المستخدم لا يزال محظورًا
           loginButton.disabled = true;
           document.getElementById('password').disabled = true;
           const remaining = bannedUntil - now;
-          showError("تم حظرك لمدة دقيقة بسبب محاولات خاطئة");
+          showMessage("تم حظرك لمدة دقيقة بسبب محاولات خاطئة", "error");
           setTimeout(() => {
             loginButton.disabled = false;
             document.getElementById('password').disabled = false;
             localStorage.removeItem("bannedUntil");
             attemptCount = 0;
+            showMessage("تم فك الحظر", "success");
           }, remaining);
         } else {
           localStorage.removeItem("bannedUntil");
@@ -281,7 +322,7 @@
         if (attemptCount >= 3) {
           const banUntil = Date.now() + BAN_DURATION;
           localStorage.setItem("bannedUntil", banUntil);
-          showError("تم حظرك لمدة دقيقة بسبب محاولات خاطئة");
+          showMessage("تم حظرك لمدة دقيقة بسبب محاولات خاطئة", "error");
           loginButton.disabled = true;
           document.getElementById('password').disabled = true;
           setTimeout(() => {
@@ -289,20 +330,13 @@
             loginButton.disabled = false;
             document.getElementById('password').disabled = false;
             localStorage.removeItem("bannedUntil");
+            showMessage("تم فك الحظر", "success");
           }, BAN_DURATION);
         } else {
-          showError("كلمة المرور غير صحيحة، الرجاء المحاولة مرة أخرى");
+          showMessage("كلمة المرور غير صحيحة، الرجاء المحاولة مرة أخرى", "error");
         }
       }
     });
-
-    function showError(message) {
-      errorMessage.textContent = message;
-      errorMessage.style.display = 'block';
-      setTimeout(() => {
-        errorMessage.style.display = 'none';
-      }, 3000);
-    }
 
     function togglePasswordVisibility() {
       const passwordInput = document.getElementById('password');
@@ -413,9 +447,7 @@
           card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
           card.style.transform = 'translateX(100%)';
           card.style.opacity = '0';
-          setTimeout(() => {
-            deleteOrder(card);
-          }, 300);
+          setTimeout(() => { deleteOrder(card); }, 300);
         } else {
           card.style.transition = 'transform 0.3s ease';
           card.style.transform = 'translateX(0)';
@@ -443,9 +475,7 @@
           card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
           card.style.transform = 'translateX(100%)';
           card.style.opacity = '0';
-          setTimeout(() => {
-            deleteOrder(card);
-          }, 300);
+          setTimeout(() => { deleteOrder(card); }, 300);
         } else {
           card.style.transition = 'transform 0.3s ease';
           card.style.transform = 'translateX(0)';
