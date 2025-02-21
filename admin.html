@@ -222,7 +222,7 @@
       <p id="order-count" style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary-color);">
         عدد الطلبات الحالية: <span id="count">0</span>
       </p>
-      <!-- رسالة التنبيه (تظهر بخلفية حمراء أو خضراء بحسب الحالة) -->
+      <!-- رسالة التنبيه -->
       <div class="alert" id="error-message"></div>
       <div class="input-group">
         <input 
@@ -260,6 +260,47 @@
     };
     firebase.initializeApp(firebaseConfig);
 
+    // ==============================================
+    // إعداد الإشعارات لتعمل حتى قبل تسجيل الدخول
+    // ==============================================
+    // متغير لتحديد انتهاء تحميل الطلبات الأولية (حتى لا تُرسل إشعارات عن الطلبات القديمة)
+    let initialLoad = true;
+
+    // طلب إذن الإشعارات من المستخدم (إذا لم يُمنح بعد)
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          console.log("تم تفعيل الإشعارات");
+        }
+      });
+    }
+
+    // الاستماع لإضافة طلب جديد بغض النظر عن حالة تسجيل الدخول
+    firebase.database().ref("orders").on("child_added", function(snapshot) {
+      if (!initialLoad) {
+        if ("Notification" in window && Notification.permission === "granted") {
+          // إنشاء الإشعار وتعيين حدث onclick
+          var notification = new Notification("طلب جديد", {
+            body: "لقد وصل طلب جديد. يرجى التحقق من لوحة التحكم.",
+            icon: "path/to/icon.png" // عدل مسار الأيقونة إذا رغبت
+          });
+          notification.onclick = function(event) {
+            event.preventDefault(); // منع السلوك الافتراضي
+            // عند النقر على الإشعار يتم فتح الموقع في نافذة جديدة
+            window.open(window.location.href, '_blank');
+          };
+        }
+      }
+    });
+
+    // بعد تحميل الطلبات الأولية، ضبط initialLoad على false
+    firebase.database().ref("orders").once("value").then(function(snapshot) {
+      initialLoad = false;
+    });
+    // ==============================================
+    // نهاية إعداد الإشعارات
+    // ==============================================
+
     const loginButton = document.getElementById('login-button');
     const errorMessage = document.getElementById('error-message');
     const orderCountSpan = document.getElementById('count');
@@ -282,7 +323,6 @@
         bannedUntil = parseInt(bannedUntil, 10);
         const now = Date.now();
         if (now < bannedUntil) {
-          // المستخدم لا يزال محظورًا
           loginButton.disabled = true;
           document.getElementById('password').disabled = true;
           const remaining = bannedUntil - now;
@@ -310,6 +350,7 @@
     }
     updateOrderCount();
 
+    // عند الضغط على زر تسجيل الدخول
     loginButton.addEventListener('click', function() {
       const password = document.getElementById('password').value.trim();
       // كلمة المرور الصحيحة هي "123"
@@ -350,10 +391,7 @@
       }
     }
 
-    // متغير لتحديد انتهاء تحميل الطلبات الأولية
-    let initialLoad = true;
-
-    // تحميل الطلبات من Firebase وعرضها
+    // تحميل الطلبات من Firebase وعرضها بعد تسجيل الدخول
     function loadOrders() {
       const ordersDiv = document.getElementById('orders');
       firebase.database().ref("orders").on("value", function(snapshot) {
@@ -410,24 +448,6 @@
         document.querySelectorAll('.order-card').forEach(card => {
           attachSwipeListener(card);
         });
-      });
-
-      // الاستماع لإضافة طلب جديد لإظهار إشعار
-      firebase.database().ref("orders").on("child_added", function(snapshot) {
-        // إذا لم يكن جزء التحميل الأولي
-        if (!initialLoad) {
-          if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("طلب جديد", {
-              body: "لقد وصل طلب جديد. يرجى التحقق من لوحة التحكم.",
-              icon: "path/to/icon.png" // عدل مسار الأيقونة حسب الحاجة
-            });
-          }
-        }
-      });
-
-      // بعد تحميل الطلبات الأولية، ضبط initialLoad على false
-      firebase.database().ref("orders").once("value").then(function(snapshot) {
-        initialLoad = false;
       });
     }
 
@@ -507,15 +527,6 @@
           isDragging = false;
           card.style.transition = 'transform 0.3s ease';
           card.style.transform = 'translateX(0)';
-        }
-      });
-    }
-
-    // طلب إذن الإشعارات إذا كانت مدعومة
-    if ("Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-          console.log("تم تفعيل الإشعارات");
         }
       });
     }
