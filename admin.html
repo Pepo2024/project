@@ -236,6 +236,7 @@
     const loginButton = document.getElementById('login-button');
     const errorMessage = document.getElementById('error-message');
     const orderCountSpan = document.getElementById('count');
+    let attemptCount = 0; // عدد محاولات الدخول
 
     // تحديث عدد الطلبات من Firebase
     function updateOrderCount() {
@@ -253,7 +254,20 @@
         document.getElementById('order-container').style.display = 'block';
         loadOrders();
       } else {
-        showError('كلمة المرور غير صحيحة، الرجاء المحاولة مرة أخرى');
+        attemptCount++;
+        if (attemptCount >= 3) {
+          showError('تم حظرك لمدة ساعه بسبب محاولات خاطئة');
+          // تعطيل الزر وحقل الإدخال
+          loginButton.disabled = true;
+          document.getElementById('password').disabled = true;
+          setTimeout(() => {
+            attemptCount = 0;
+            loginButton.disabled = false;
+            document.getElementById('password').disabled = false;
+          }, 600000); // 60000 مللي ثانية = دقيقة واحدة
+        } else {
+          showError('كلمة المرور غير صحيحة، الرجاء المحاولة مرة أخرى');
+        }
       }
     });
 
