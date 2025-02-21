@@ -9,6 +9,8 @@
   <!-- تضمين مكتبات Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <!-- تضمين مكتبة Firebase Messaging -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
   <style>
     :root {
       --primary-color: #2E86C1;
@@ -31,7 +33,7 @@
       margin: 2rem auto;
       padding: 0 1rem;
     }
-    /* تصميم صفحة الدخول */
+    /* صفحة الدخول */
     .auth-card {
       background: var(--card-bg);
       border-radius: 1rem;
@@ -86,7 +88,7 @@
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(46, 134, 193, 0.3);
     }
-    /* تصميم قائمة الطلبات */
+    /* قائمة الطلبات */
     .orders-header {
       display: flex;
       justify-content: space-between;
@@ -157,7 +159,7 @@
       border-radius: 1rem;
       box-shadow: var(--shadow);
     }
-    /* تنسيق رسائل التنبيه */
+    /* رسائل التنبيه */
     .alert {
       position: fixed;
       top: 20px;
@@ -175,13 +177,11 @@
       opacity: 1;
       pointer-events: auto;
     }
-    /* تنسيق الأخطاء باللون الأحمر مع اهتزاز */
     .alert.error {
       background-color: var(--error-color);
       color: #fff;
       animation: shake 0.5s;
     }
-    /* تنسيق رسائل النجاح (عند فك الحظر) باللون الأخضر */
     .alert.success {
       background-color: var(--success-color);
       color: #fff;
@@ -225,21 +225,14 @@
       <!-- رسالة التنبيه -->
       <div class="alert" id="error-message"></div>
       <div class="input-group">
-        <input 
-          type="password" 
-          id="password" 
-          placeholder="كلمة المرور"
-          autocomplete="current-password"
-        >
+        <input type="password" id="password" placeholder="كلمة المرور" autocomplete="current-password">
         <span class="toggle-password" onclick="togglePasswordVisibility()">
           <i class="fas fa-eye"></i>
         </span>
       </div>
-      <button class="btn-primary" id="login-button">
-        دخول إلى لوحة التحكم
-      </button>
+      <button class="btn-primary" id="login-button">دخول إلى لوحة التحكم</button>
     </div>
-    <!-- واجهة الطلبات -->
+    <!-- لوحة عرض الطلبات -->
     <div id="order-container" style="display:none;">
       <div class="orders-header">
         <h2>الطلبات المقدمة</h2>
@@ -260,46 +253,76 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    // ==============================================
-    // إعداد الإشعارات لتعمل حتى قبل تسجيل الدخول
-    // ==============================================
-    // متغير لتحديد انتهاء تحميل الطلبات الأولية (حتى لا تُرسل إشعارات عن الطلبات القديمة)
-    let initialLoad = true;
-
-    // طلب إذن الإشعارات من المستخدم (إذا لم يُمنح بعد)
-    if ("Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-          console.log("تم تفعيل الإشعارات");
-        }
+    // تسجيل Service Worker للتطبيق
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then(registration => {
+        console.log('تم تسجيل Service Worker بنجاح:', registration);
+      }).catch(err => {
+        console.log('فشل تسجيل Service Worker:', err);
       });
     }
 
-    // الاستماع لإضافة طلب جديد بغض النظر عن حالة تسجيل الدخول
+    // =====================================================
+    // إعداد Firebase Cloud Messaging (FCM) للدعم على الموبايل
+    // =====================================================
+    const messaging = firebase.messaging();
+    // استبدل المفتاح التالي بمفتاح VAPID الذي زودتنا به
+    messaging.usePublicVapidKey('BIr0VwRaBu2y2TPbs89jWg-DVpdW5czP_wWWnPucEb8Xs9MBW6Jjk9IhXEXCdhYE3zBIMCc0yLAokodRcjVCxCI');
+
+    messaging.requestPermission()
+      .then(() => {
+        console.log('تم منح إذن الإشعارات عبر FCM');
+        return messaging.getToken();
+      })
+      .then((token) => {
+        console.log('FCM Token:', token);
+        // يمكنك إرسال هذا التوكن إلى خادمك ليستخدمه في إرسال الإشعارات
+      })
+      .catch((err) => {
+        console.log('فشل الحصول على إذن الإشعارات:', err);
+      });
+
+    // استقبال الرسائل عندما يكون التطبيق في المقدمة
+    messaging.onMessage((payload) => {
+      console.log('تم استلام رسالة:', payload);
+      if (Notification.permission === "granted") {
+        var notification = new Notification(payload.notification.title, {
+          body: payload.notification.body,
+          icon: payload.notification.icon
+        });
+        notification.onclick = function(event) {
+          event.preventDefault();
+          window.open(window.location.href, '_blank');
+        };
+      }
+    });
+    // =====================================================
+    // نهاية إعداد FCM
+    // =====================================================
+
+    // متغير لتحديد انتهاء تحميل الطلبات الأولية (لعدم إرسال إشعارات للطلبات القديمة)
+    let initialLoad = true;
+
+    // الاستماع لإضافة طلب جديد عبر Firebase (للإشعارات عندما يكون الموقع مفتوحاً)
     firebase.database().ref("orders").on("child_added", function(snapshot) {
       if (!initialLoad) {
         if ("Notification" in window && Notification.permission === "granted") {
-          // إنشاء الإشعار وتعيين حدث onclick
           var notification = new Notification("طلب جديد", {
             body: "لقد وصل طلب جديد. يرجى التحقق من لوحة التحكم.",
-            icon: "path/to/icon.png" // عدل مسار الأيقونة إذا رغبت
+            icon: "path/to/icon.png" // عدل مسار الأيقونة حسب رغبتك
           });
           notification.onclick = function(event) {
-            event.preventDefault(); // منع السلوك الافتراضي
-            // عند النقر على الإشعار يتم فتح الموقع في نافذة جديدة
+            event.preventDefault();
             window.open(window.location.href, '_blank');
           };
         }
       }
     });
-
-    // بعد تحميل الطلبات الأولية، ضبط initialLoad على false
+    // ضبط initialLoad على false بعد تحميل الطلبات الأولية
     firebase.database().ref("orders").once("value").then(function(snapshot) {
       initialLoad = false;
     });
-    // ==============================================
-    // نهاية إعداد الإشعارات
-    // ==============================================
 
     const loginButton = document.getElementById('login-button');
     const errorMessage = document.getElementById('error-message');
@@ -307,7 +330,6 @@
     let attemptCount = 0; // عدد محاولات الدخول
     const BAN_DURATION = 60000; // مدة الحظر: دقيقة واحدة
 
-    // دالة عرض رسالة مع نوعها (error أو success)
     function showMessage(message, type) {
       errorMessage.textContent = message;
       errorMessage.className = "alert show " + type;
@@ -316,7 +338,6 @@
       }, 3000);
     }
 
-    // دالة لفحص حالة الحظر عند تحميل الصفحة باستخدام localStorage
     function checkBanStatus() {
       let bannedUntil = localStorage.getItem("bannedUntil");
       if (bannedUntil) {
@@ -341,7 +362,6 @@
     }
     checkBanStatus();
 
-    // تحديث عدد الطلبات من Firebase
     function updateOrderCount() {
       firebase.database().ref("orders").once("value").then(function(snapshot) {
         const ordersCount = snapshot.numChildren();
@@ -350,10 +370,8 @@
     }
     updateOrderCount();
 
-    // عند الضغط على زر تسجيل الدخول
     loginButton.addEventListener('click', function() {
       const password = document.getElementById('password').value.trim();
-      // كلمة المرور الصحيحة هي "123"
       if (password === '123') {
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('order-container').style.display = 'block';
@@ -391,7 +409,6 @@
       }
     }
 
-    // تحميل الطلبات من Firebase وعرضها بعد تسجيل الدخول
     function loadOrders() {
       const ordersDiv = document.getElementById('orders');
       firebase.database().ref("orders").on("value", function(snapshot) {
@@ -444,7 +461,6 @@
           ordersDiv.innerHTML = ordersHTML;
         }
         updateOrderCount();
-        // تفعيل خاصية السحب والحذف لكل بطاقة
         document.querySelectorAll('.order-card').forEach(card => {
           attachSwipeListener(card);
         });
@@ -468,7 +484,6 @@
         firebase.database().ref("orders/" + orderKey).remove();
       }
 
-      // للأجهزة اللمسية
       card.addEventListener('touchstart', function(e) {
         startX = e.touches[0].clientX;
         isDragging = true;
@@ -494,8 +509,6 @@
           card.style.transform = 'translateX(0)';
         }
       });
-
-      // للأجهزة التي تستخدم الفأرة
       card.addEventListener('mousedown', function(e) {
         startX = e.clientX;
         isDragging = true;
