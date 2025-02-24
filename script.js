@@ -165,3 +165,19 @@ themeToggle.addEventListener('click', toggleTheme);
         }
     }
 });
+
+function updateThemeIcon() {
+    const isDark = body.getAttribute('data-theme') === 'dark';
+    // تحديث أيقونة الزر
+    themeToggle.innerHTML = `<i class="fas ${isDark ? 'fa-moon' : 'fa-sun'}"></i> ${isDark ? 'الوضع الليلي' : 'الوضع النهاري'}`;
+    
+    // تحديث الصور في القائمة
+    document.querySelectorAll('.sidebar-image img').forEach(img => {
+        img.style.display = 'none';
+    });
+    if(isDark) {
+        document.querySelector('.dark-image').style.display = 'block';
+    } else {
+        document.querySelector('.light-image').style.display = 'block';
+    }
+}
