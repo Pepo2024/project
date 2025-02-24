@@ -397,3 +397,18 @@ header h1 {
         width: 250px;
     }
 }
+
+.sidebar-image img {
+    width: 100%;
+    max-width: 200px;
+    border-radius: 10px;
+    display: none;
+}
+
+[data-theme="dark"] .dark-image {
+    display: block;
+}
+
+[data-theme="light"] .light-image {
+    display: block;
+}
