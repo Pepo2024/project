@@ -6,10 +6,8 @@
   <title>نظام إدارة الطلبات</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <!-- تضمين مكتبات Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <!-- تضمين مكتبة Firebase Messaging -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
   <style>
     :root {
@@ -33,7 +31,6 @@
       margin: 2rem auto;
       padding: 0 1rem;
     }
-    /* صفحة الدخول */
     .auth-card {
       background: var(--card-bg);
       border-radius: 1rem;
@@ -51,10 +48,7 @@
       font-size: 1.8rem;
       margin-bottom: 0.5rem;
     }
-    .input-group {
-      margin-bottom: 1.5rem;
-      position: relative;
-    }
+    .input-group { margin-bottom: 1.5rem; position: relative; }
     .input-group input {
       width: 100%;
       padding: 1rem 1rem 1rem 40px;
@@ -63,7 +57,10 @@
       font-size: 1rem;
       transition: border-color 0.3s ease;
     }
-    .input-group input:focus { border-color: var(--primary-color); outline: none; }
+    .input-group input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
     .input-group .toggle-password {
       position: absolute;
       left: 10px;
@@ -88,7 +85,6 @@
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(46, 134, 193, 0.3);
     }
-    /* قائمة الطلبات */
     .orders-header {
       display: flex;
       justify-content: space-between;
@@ -131,7 +127,6 @@
       font-size: 1.2rem;
       transition: transform 0.3s ease;
     }
-    .order-summary .arrow i { transition: transform 0.3s ease; }
     .order-details {
       max-height: 0;
       overflow: hidden;
@@ -159,7 +154,6 @@
       border-radius: 1rem;
       box-shadow: var(--shadow);
     }
-    /* رسائل التنبيه */
     .alert {
       position: fixed;
       top: 20px;
@@ -186,6 +180,22 @@
       background-color: var(--success-color);
       color: #fff;
     }
+    .delete-btn {
+      background: var(--error-color);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Cairo', sans-serif;
+      transition: background 0.3s ease;
+      float: left;
+    }
+    .delete-btn:hover { background: #c0392b; }
     @keyframes shake {
       0% { transform: translateX(-50%) translateX(0); }
       10% { transform: translateX(-50%) translateX(-10px); }
@@ -212,17 +222,14 @@
 </head>
 <body>
   <div class="container">
-    <!-- واجهة الدخول -->
     <div class="auth-card" id="login-container">
       <div class="auth-header">
         <h2>مرحبًا بك في نظام الإدارة</h2>
         <p>الرجاء إدخال كلمة المرور للوصول</p>
       </div>
-      <!-- عرض عدد الطلبات الحالية -->
       <p id="order-count" style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary-color);">
         عدد الطلبات الحالية: <span id="count">0</span>
       </p>
-      <!-- رسالة التنبيه -->
       <div class="alert" id="error-message"></div>
       <div class="input-group">
         <input type="password" id="password" placeholder="كلمة المرور" autocomplete="current-password">
@@ -232,7 +239,6 @@
       </div>
       <button class="btn-primary" id="login-button">دخول إلى لوحة التحكم</button>
     </div>
-    <!-- لوحة عرض الطلبات -->
     <div id="order-container" style="display:none;">
       <div class="orders-header">
         <h2>الطلبات المقدمة</h2>
@@ -241,8 +247,12 @@
       <div class="orders-list" id="orders"></div>
     </div>
   </div>
+
+  <!-- صوت الحذف -->
+  <audio id="delete-sound" src="https://cdn.pixabay.com/download/audio/2022/11/14/audio_5a6c0c3a2a.mp3"></audio>
+
   <script>
-    // --- تهيئة Firebase ---
+    // إعدادات Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD4NiKlU6SIJVxbnbk60SkRt8BNqlonk-U",
       authDomain: "mina-project-c10b2.firebaseapp.com",
@@ -252,124 +262,76 @@
       appId: "1:1088494592963:web:de6a787bc3b1694ccd1376"
     };
     firebase.initializeApp(firebaseConfig);
-
-    // تسجيل Service Worker للتطبيق
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/firebase-messaging-sw.js')
-      .then(registration => {
-        console.log('تم تسجيل Service Worker بنجاح:', registration);
-      }).catch(err => {
-        console.log('فشل تسجيل Service Worker:', err);
-      });
-    }
-
-    // =====================================================
-    // إعداد Firebase Cloud Messaging (FCM) للدعم على الموبايل
-    // =====================================================
+    
+    // إعداد Firebase Messaging
     const messaging = firebase.messaging();
-    // استبدل المفتاح التالي بمفتاح VAPID الذي زودتنا به
     messaging.usePublicVapidKey('BIr0VwRaBu2y2TPbs89jWg-DVpdW5czP_wWWnPucEb8Xs9MBW6Jjk9IhXEXCdhYE3zBIMCc0yLAokodRcjVCxCI');
-
+    
+    // طلب إذن الإشعارات
     messaging.requestPermission()
-      .then(() => {
-        console.log('تم منح إذن الإشعارات عبر FCM');
-        return messaging.getToken();
-      })
-      .then((token) => {
-        console.log('FCM Token:', token);
-        // يمكنك إرسال هذا التوكن إلى خادمك ليستخدمه في إرسال الإشعارات
-      })
-      .catch((err) => {
-        console.log('فشل الحصول على إذن الإشعارات:', err);
-      });
-
-    // استقبال الرسائل عندما يكون التطبيق في المقدمة
+      .then(() => messaging.getToken())
+      .catch((err) => console.log('فشل الحصول على إذن الإشعارات:', err));
+    
+    // التعامل مع الإشعارات الواردة
     messaging.onMessage((payload) => {
-      console.log('تم استلام رسالة:', payload);
       if (Notification.permission === "granted") {
-        var notification = new Notification(payload.notification.title, {
+        new Notification(payload.notification.title, {
           body: payload.notification.body,
           icon: payload.notification.icon
         });
-        notification.onclick = function(event) {
-          event.preventDefault();
-          window.open(window.location.href, '_blank');
-        };
       }
     });
-    // =====================================================
-    // نهاية إعداد FCM
-    // =====================================================
-
-    // متغير لتحديد انتهاء تحميل الطلبات الأولية (لعدم إرسال إشعارات للطلبات القديمة)
+    
+    // متغير لتعقب التحميل الأولي للطلبات
     let initialLoad = true;
-
-    // الاستماع لإضافة طلب جديد عبر Firebase (للإشعارات عندما يكون الموقع مفتوحاً)
     firebase.database().ref("orders").on("child_added", function(snapshot) {
-      if (!initialLoad) {
-        if ("Notification" in window && Notification.permission === "granted") {
-          var notification = new Notification("طلب جديد", {
-            body: "لقد وصل طلب جديد. يرجى التحقق من لوحة التحكم.",
-            icon: "path/to/icon.png" // عدل مسار الأيقونة حسب رغبتك
-          });
-          notification.onclick = function(event) {
-            event.preventDefault();
-            window.open(window.location.href, '_blank');
-          };
-        }
+      if (!initialLoad && Notification.permission === "granted") {
+        new Notification("طلب جديد", {
+          body: "لقد وصل طلب جديد. يرجى التحقق من لوحة التحكم.",
+          icon: "https://via.placeholder.com/100" // يمكن تغيير مسار الأيقونة هنا
+        });
       }
     });
-    // ضبط initialLoad على false بعد تحميل الطلبات الأولية
-    firebase.database().ref("orders").once("value").then(function(snapshot) {
+    // بعد تحميل الطلبات الأولية يتم تغيير قيمة initialLoad
+    firebase.database().ref("orders").once("value", () => {
       initialLoad = false;
     });
-
+    
     const loginButton = document.getElementById('login-button');
     const errorMessage = document.getElementById('error-message');
     const orderCountSpan = document.getElementById('count');
-    let attemptCount = 0; // عدد محاولات الدخول
-    const BAN_DURATION = 60000; // مدة الحظر: دقيقة واحدة
-
+    
+    let attemptCount = 0;
+    const BAN_DURATION = 60000; // دقيقة واحدة
+    
     function showMessage(message, type) {
       errorMessage.textContent = message;
       errorMessage.className = "alert show " + type;
-      setTimeout(() => {
-        errorMessage.classList.remove("show");
-      }, 3000);
+      setTimeout(() => errorMessage.classList.remove("show"), 3000);
     }
-
+    
     function checkBanStatus() {
       let bannedUntil = localStorage.getItem("bannedUntil");
-      if (bannedUntil) {
-        bannedUntil = parseInt(bannedUntil, 10);
-        const now = Date.now();
-        if (now < bannedUntil) {
-          loginButton.disabled = true;
-          document.getElementById('password').disabled = true;
-          const remaining = bannedUntil - now;
-          showMessage("تم حظرك لمدة دقيقة بسبب محاولات خاطئة", "error");
-          setTimeout(() => {
-            loginButton.disabled = false;
-            document.getElementById('password').disabled = false;
-            localStorage.removeItem("bannedUntil");
-            attemptCount = 0;
-            showMessage("تم فك الحظر", "success");
-          }, remaining);
-        } else {
+      if (bannedUntil && Date.now() < parseInt(bannedUntil)) {
+        loginButton.disabled = true;
+        document.getElementById('password').disabled = true;
+        setTimeout(() => {
+          loginButton.disabled = false;
+          document.getElementById('password').disabled = false;
           localStorage.removeItem("bannedUntil");
-        }
+          attemptCount = 0;
+        }, bannedUntil - Date.now());
       }
     }
     checkBanStatus();
-
+    
     function updateOrderCount() {
-      firebase.database().ref("orders").once("value").then(function(snapshot) {
-        const ordersCount = snapshot.numChildren();
-        orderCountSpan.textContent = ordersCount;
+      firebase.database().ref("orders").once("value").then(snapshot => {
+        orderCountSpan.textContent = snapshot.numChildren();
       });
     }
     updateOrderCount();
-
+    
     loginButton.addEventListener('click', function() {
       const password = document.getElementById('password').value.trim();
       if (password === '123') {
@@ -377,41 +339,33 @@
         document.getElementById('order-container').style.display = 'block';
         loadOrders();
       } else {
-        attemptCount++;
-        if (attemptCount >= 3) {
+        if (++attemptCount >= 3) {
           const banUntil = Date.now() + BAN_DURATION;
           localStorage.setItem("bannedUntil", banUntil);
           showMessage("تم حظرك لمدة دقيقة بسبب محاولات خاطئة", "error");
           loginButton.disabled = true;
           document.getElementById('password').disabled = true;
           setTimeout(() => {
-            attemptCount = 0;
             loginButton.disabled = false;
             document.getElementById('password').disabled = false;
-            localStorage.removeItem("bannedUntil");
-            showMessage("تم فك الحظر", "success");
+            attemptCount = 0;
           }, BAN_DURATION);
         } else {
           showMessage("كلمة المرور غير صحيحة، الرجاء المحاولة مرة أخرى", "error");
         }
       }
     });
-
+    
     function togglePasswordVisibility() {
       const passwordInput = document.getElementById('password');
       const toggleIcon = document.querySelector('.toggle-password i');
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
-      } else {
-        passwordInput.type = 'password';
-        toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
-      }
+      passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+      toggleIcon.classList.toggle('fa-eye-slash');
     }
-
+    
     function loadOrders() {
       const ordersDiv = document.getElementById('orders');
-      firebase.database().ref("orders").on("value", function(snapshot) {
+      firebase.database().ref("orders").on("value", snapshot => {
         if (!snapshot.exists()) {
           ordersDiv.innerHTML = `
             <div class="empty-state">
@@ -419,129 +373,71 @@
               <p>سيظهر هنا أي طلبات جديدة يتم تقديمها</p>
             </div>`;
         } else {
-          let ordersHTML = "";
-          snapshot.forEach(function(childSnapshot) {
+          ordersDiv.innerHTML = '';
+          snapshot.forEach(childSnapshot => {
             const order = childSnapshot.val();
             const orderKey = childSnapshot.key;
-            ordersHTML += `
-              <div class="order-card" data-key="${orderKey}">
-                <div class="order-summary" onclick="toggleDetails(this)">
-                  <h3>طلب من: ${order.leader}</h3>
-                  <span class="arrow"><i class="fas fa-chevron-down"></i></span>
+            const orderCard = document.createElement('div');
+            orderCard.className = 'order-card';
+            orderCard.setAttribute('data-key', orderKey);
+            orderCard.innerHTML = `
+              <div class="order-summary" onclick="toggleDetails(this)">
+                <h3>طلب من: ${order.leader}</h3>
+                <span class="arrow"><i class="fas fa-chevron-down"></i></span>
+              </div>
+              <div class="order-details">
+                <div class="order-field">
+                  <strong>اسم الخدمة</strong>
+                  ${order.serviceName}
                 </div>
-                <div class="order-details">
-                  <div class="order-field">
-                    <strong>اسم الخدمة</strong>
-                    ${order.serviceName}
-                  </div>
-                  <div class="order-field">
-                    <strong>المكان</strong>
-                    ${order.location}
-                  </div>
-                  <div class="order-field">
-                    <strong>رقم التواصل</strong>
-                    ${order.whatsapp}
-                  </div>
-                  <div class="order-field">
-                    <strong>التوقيت</strong>
-                    ${order.day} - ${order.time}
-                  </div>
-                  <div class="order-field">
-                    <strong>الإضافات</strong>
-                    ${order.equipment && order.equipment.length ? order.equipment.join('، ') : 'لا يوجد'}
-                  </div>
-                  <div class="order-field">
-                    <strong>ملاحظات</strong>
-                    ${order.other ? order.other : 'لا يوجد'}
-                  </div>
+                <div class="order-field">
+                  <strong>المكان</strong>
+                  ${order.location}
                 </div>
+                <div class="order-field">
+                  <strong>رقم التواصل</strong>
+                  ${order.whatsapp}
+                </div>
+                <div class="order-field">
+                  <strong>التوقيت</strong>
+                  ${order.day} - ${order.time}
+                </div>
+                <div class="order-field">
+                  <strong>الإضافات</strong>
+                  ${order.equipment?.length ? order.equipment.join('، ') : 'لا يوجد'}
+                </div>
+                <div class="order-field">
+                  <strong>ملاحظات</strong>
+                  ${order.other || 'لا يوجد'}
+                </div>
+                <button class="delete-btn" onclick="deleteOrder('${orderKey}')">
+                  <i class="fas fa-trash"></i>
+                  حذف الطلب
+                </button>
               </div>
             `;
+            ordersDiv.appendChild(orderCard);
           });
-          ordersDiv.innerHTML = ordersHTML;
         }
         updateOrderCount();
-        document.querySelectorAll('.order-card').forEach(card => {
-          attachSwipeListener(card);
-        });
       });
     }
-
+    
     function toggleDetails(element) {
       const details = element.nextElementSibling;
       const arrowIcon = element.querySelector('.arrow i');
       details.classList.toggle('open');
       arrowIcon.style.transform = details.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
     }
-
-    function attachSwipeListener(card) {
-      let startX = 0;
-      let currentX = 0;
-      let isDragging = false;
-
-      function deleteOrder(card) {
-        const orderKey = card.getAttribute('data-key');
-        firebase.database().ref("orders/" + orderKey).remove();
+    
+    function deleteOrder(orderKey) {
+      if (confirm('هل أنت متأكد من رغبتك في حذف هذا الطلب؟')) {
+        const deleteSound = document.getElementById('delete-sound');
+        deleteSound.play();
+        firebase.database().ref("orders/" + orderKey).remove()
+          .then(() => showMessage('تم حذف الطلب بنجاح', 'success'))
+          .catch(() => showMessage('حدث خطأ أثناء الحذف', 'error'));
       }
-
-      card.addEventListener('touchstart', function(e) {
-        startX = e.touches[0].clientX;
-        isDragging = true;
-      });
-      card.addEventListener('touchmove', function(e) {
-        if (!isDragging) return;
-        currentX = e.touches[0].clientX;
-        let diffX = currentX - startX;
-        if (diffX > 0) {
-          card.style.transform = `translateX(${diffX}px)`;
-        }
-      });
-      card.addEventListener('touchend', function(e) {
-        isDragging = false;
-        let diffX = currentX - startX;
-        if (diffX > 100) {
-          card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-          card.style.transform = 'translateX(100%)';
-          card.style.opacity = '0';
-          setTimeout(() => { deleteOrder(card); }, 300);
-        } else {
-          card.style.transition = 'transform 0.3s ease';
-          card.style.transform = 'translateX(0)';
-        }
-      });
-      card.addEventListener('mousedown', function(e) {
-        startX = e.clientX;
-        isDragging = true;
-      });
-      card.addEventListener('mousemove', function(e) {
-        if (!isDragging) return;
-        currentX = e.clientX;
-        let diffX = currentX - startX;
-        if (diffX > 0) {
-          card.style.transform = `translateX(${diffX}px)`;
-        }
-      });
-      card.addEventListener('mouseup', function(e) {
-        if (!isDragging) return;
-        isDragging = false;
-        let diffX = currentX - startX;
-        if (diffX > 100) {
-          card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-          card.style.transform = 'translateX(100%)';
-          card.style.opacity = '0';
-          setTimeout(() => { deleteOrder(card); }, 300);
-        } else {
-          card.style.transition = 'transform 0.3s ease';
-          card.style.transform = 'translateX(0)';
-        }
-      });
-      card.addEventListener('mouseleave', function(e) {
-        if (isDragging) {
-          isDragging = false;
-          card.style.transition = 'transform 0.3s ease';
-          card.style.transform = 'translateX(0)';
-        }
-      });
     }
   </script>
 </body>
