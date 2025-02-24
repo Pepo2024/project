@@ -281,7 +281,7 @@ header h1 {
 .buttons {
     padding: 1.5rem;
     max-width: 800px;
-    margin-top: 0.2rem;
+    margin: 0 auto;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.8s 1s forwards;
