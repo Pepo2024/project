@@ -265,7 +265,7 @@ body {
 }
 
 header {
-    padding: 3rem 1rem;
+    padding: 2rem 1rem;
     text-align: center;
     opacity: 0;
     transform: translateY(20px);
