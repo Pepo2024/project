@@ -89,6 +89,22 @@
       box-shadow: 0 5px 15px rgba(46, 134, 193, 0.3);
     }
 
+    .password-input {
+      width: 100%;
+      padding: 1rem;
+      margin: 1rem 0;
+      border: 2px solid #eee;
+      border-radius: 0.5rem;
+      font-family: 'Cairo', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .password-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
     .orders-header {
       display: flex;
       flex-direction: column;
@@ -279,6 +295,22 @@
       </button>
     </div>
 
+    <!-- واجهة كلمة المرور -->
+    <div id="password-container" style="display:none;">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h2>مرحبًا مرة أخرى!</h2>
+          <p>الرجاء إدخال كلمة المرور الإدارية</p>
+        </div>
+        <div class="alert" id="password-error"></div>
+        <input type="password" id="admin-password" placeholder="كلمة المرور الإدارية" class="password-input">
+        <button class="btn-primary" onclick="checkPassword()">
+          <i class="fas fa-lock"></i>
+          تأكيد الدخول
+        </button>
+      </div>
+    </div>
+
     <!-- واجهة إدارة الطلبات -->
     <div id="order-container" style="display:none;">
       <div class="orders-header">
@@ -309,25 +341,71 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    // مصادقة جوجل
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById('login-container').style.display = 'none';
-        document.getElementById('order-container').style.display = 'block';
-        loadOrders();
+    // دالات التحكم في الواجهات
+    function showLoginPage() {
+      document.getElementById('login-container').style.display = 'block';
+      document.getElementById('password-container').style.display = 'none';
+      document.getElementById('order-container').style.display = 'none';
+    }
+
+    function handleAuthSuccess() {
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('password-container').style.display = 'block';
+    }
+
+    // كشف نوع الجهاز
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    // معالجة تسجيل الدخول
+    document.getElementById('login-button').addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      
+      if(isMobile()) {
+        firebase.auth().signInWithRedirect(provider);
       } else {
-        document.getElementById('login-container').style.display = 'block';
-        document.getElementById('order-container').style.display = 'none';
+        firebase.auth().signInWithPopup(provider)
+          .catch(error => showMessage("فشل تسجيل الدخول: " + error.message, "error"));
       }
     });
 
-    document.getElementById('login-button').addEventListener('click', () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithPopup(provider)
-        .catch(error => {
-          showMessage("فشل تسجيل الدخول: " + error.message, "error");
-        });
+    // معالجة نتيجة الـ redirect
+    firebase.auth().getRedirectResult()
+      .then(result => { if(result.user) handleAuthSuccess() })
+      .catch(error => showMessage("فشل تسجيل الدخول: " + error.message, "error"));
+
+    // مراقبة حالة المصادقة
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) handleAuthSuccess();
+      else showLoginPage();
     });
+
+    // التحقق من كلمة المرور
+    function checkPassword() {
+      const enteredPassword = document.getElementById('admin-password').value;
+      const errorElement = document.getElementById('password-error');
+      
+      firebase.database().ref("adminPassword").once("value")
+        .then(snapshot => {
+          const correctPassword = snapshot.val();
+          
+          if(enteredPassword === correctPassword) {
+            document.getElementById('password-container').style.display = 'none';
+            document.getElementById('order-container').style.display = 'block';
+            loadOrders();
+          } else {
+            showPasswordError(errorElement);
+          }
+        })
+        .catch(() => showPasswordError(errorElement));
+    }
+
+    function showPasswordError(element) {
+      element.textContent = "كلمة المرور غير صحيحة!";
+      element.className = "alert show error";
+      setTimeout(() => element.classList.remove("show"), 3000);
+    }
 
     // وظائف إدارة الطلبات
     function showMessage(message, type) {
