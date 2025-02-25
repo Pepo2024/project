@@ -295,7 +295,7 @@
       </button>
     </div>
 
-    <!-- واجهة كلمة المرور -->
+    <!-- صفحة كلمة المرور -->
     <div id="password-container" style="display:none;">
       <div class="auth-card">
         <div class="auth-header">
@@ -341,24 +341,12 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    // دالات التحكم في الواجهات
-    function showLoginPage() {
-      document.getElementById('login-container').style.display = 'block';
-      document.getElementById('password-container').style.display = 'none';
-      document.getElementById('order-container').style.display = 'none';
-    }
-
-    function handleAuthSuccess() {
-      document.getElementById('login-container').style.display = 'none';
-      document.getElementById('password-container').style.display = 'block';
-    }
-
-    // كشف نوع الجهاز
+    // دالة كشف الجهاز
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
-    // معالجة تسجيل الدخول
+    // تسجيل الدخول
     document.getElementById('login-button').addEventListener('click', () => {
       const provider = new firebase.auth.GoogleAuthProvider();
       
@@ -366,39 +354,56 @@
         firebase.auth().signInWithRedirect(provider);
       } else {
         firebase.auth().signInWithPopup(provider)
-          .catch(error => showMessage("فشل تسجيل الدخول: " + error.message, "error"));
+          .catch(error => {
+            showMessage("فشل تسجيل الدخول: " + error.message, "error");
+          });
       }
     });
 
-    // معالجة نتيجة الـ redirect
-    firebase.auth().getRedirectResult()
-      .then(result => { if(result.user) handleAuthSuccess() })
-      .catch(error => showMessage("فشل تسجيل الدخول: " + error.message, "error"));
+    // معالجة نتيجة التسجيل
+    firebase.auth().getRedirectResult().then(result => {
+      if(result.user) handleAuthSuccess();
+    }).catch(error => {
+      showMessage("فشل تسجيل الدخول: " + error.message, "error");
+    });
 
     // مراقبة حالة المصادقة
     firebase.auth().onAuthStateChanged(user => {
-      if (user) handleAuthSuccess();
-      else showLoginPage();
+      if (user) {
+        handleAuthSuccess();
+      } else {
+        showLoginPage();
+      }
     });
+
+    // التحكم في الواجهات
+    function handleAuthSuccess() {
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('password-container').style.display = 'block';
+    }
+
+    function showLoginPage() {
+      document.getElementById('login-container').style.display = 'block';
+      document.getElementById('password-container').style.display = 'none';
+      document.getElementById('order-container').style.display = 'none';
+    }
 
     // التحقق من كلمة المرور
     function checkPassword() {
       const enteredPassword = document.getElementById('admin-password').value;
       const errorElement = document.getElementById('password-error');
       
-      firebase.database().ref("adminPassword").once("value")
-        .then(snapshot => {
-          const correctPassword = snapshot.val();
-          
-          if(enteredPassword === correctPassword) {
-            document.getElementById('password-container').style.display = 'none';
-            document.getElementById('order-container').style.display = 'block';
-            loadOrders();
-          } else {
-            showPasswordError(errorElement);
-          }
-        })
-        .catch(() => showPasswordError(errorElement));
+      firebase.database().ref("adminPassword").once("value").then(snapshot => {
+        const correctPassword = snapshot.val();
+        
+        if(enteredPassword === correctPassword) {
+          document.getElementById('password-container').style.display = 'none';
+          document.getElementById('order-container').style.display = 'block';
+          loadOrders();
+        } else {
+          showPasswordError(errorElement);
+        }
+      }).catch(() => showPasswordError(errorElement));
     }
 
     function showPasswordError(element) {
