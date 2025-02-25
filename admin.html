@@ -89,20 +89,32 @@
       box-shadow: 0 5px 15px rgba(46, 134, 193, 0.3);
     }
 
-    .password-input {
+    .input-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .input-group input {
       width: 100%;
       padding: 1rem;
-      margin: 1rem 0;
-      border: 2px solid #eee;
+      border: 2px solid #e0e0e0;
       border-radius: 0.5rem;
-      font-family: 'Cairo', sans-serif;
       font-size: 1rem;
       transition: border-color 0.3s ease;
     }
 
-    .password-input:focus {
-      outline: none;
+    .input-group input:focus {
       border-color: var(--primary-color);
+      outline: none;
+    }
+
+    .toggle-password {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--primary-color);
     }
 
     .orders-header {
@@ -289,7 +301,7 @@
         <p>تسجيل الدخول باستخدام حساب جوجل</p>
       </div>
       <div class="alert" id="error-message"></div>
-      <button class="btn-primary" id="login-button">
+      <button class="btn-primary" id="google-login">
         <i class="fab fa-google"></i>
         تسجيل الدخول باستخدام جوجل
       </button>
@@ -303,7 +315,12 @@
           <p>الرجاء إدخال كلمة المرور الإدارية</p>
         </div>
         <div class="alert" id="password-error"></div>
-        <input type="password" id="admin-password" placeholder="كلمة المرور الإدارية" class="password-input">
+        <div class="input-group">
+          <input type="password" id="admin-password" placeholder="كلمة المرور الإدارية">
+          <span class="toggle-password" onclick="togglePasswordVisibility()">
+            <i class="fas fa-eye"></i>
+          </span>
+        </div>
         <button class="btn-primary" onclick="checkPassword()">
           <i class="fas fa-lock"></i>
           تأكيد الدخول
@@ -341,13 +358,18 @@
     };
     firebase.initializeApp(firebaseConfig);
 
+    // متغيرات النظام
+    let attemptCount = 0;
+    const MAX_ATTEMPTS = 3;
+    const BAN_DURATION = 60000; // 1 دقيقة
+
     // دالة كشف الجهاز
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
-    // تسجيل الدخول
-    document.getElementById('login-button').addEventListener('click', () => {
+    // تسجيل الدخول بجوجل
+    document.getElementById('google-login').addEventListener('click', () => {
       const provider = new firebase.auth.GoogleAuthProvider();
       
       if(isMobile()) {
@@ -380,12 +402,38 @@
     function handleAuthSuccess() {
       document.getElementById('login-container').style.display = 'none';
       document.getElementById('password-container').style.display = 'block';
+      checkBanStatus();
     }
 
     function showLoginPage() {
       document.getElementById('login-container').style.display = 'block';
       document.getElementById('password-container').style.display = 'none';
       document.getElementById('order-container').style.display = 'none';
+    }
+
+    // التحقق من حالة الحظر
+    function checkBanStatus() {
+      const bannedUntil = localStorage.getItem("bannedUntil");
+      if (bannedUntil && Date.now() < bannedUntil) {
+        const remainingTime = bannedUntil - Date.now();
+        showMessage(`تم حظرك لمدة ${Math.ceil(remainingTime/1000)} ثانية`, "error");
+        disableLogin();
+        setTimeout(enableLogin, remainingTime);
+      }
+    }
+
+    // تعطيل الواجهة
+    function disableLogin() {
+      document.getElementById('admin-password').disabled = true;
+      document.querySelector('#password-container button').disabled = true;
+    }
+
+    // تمكين الواجهة
+    function enableLogin() {
+      document.getElementById('admin-password').disabled = false;
+      document.querySelector('#password-container button').disabled = false;
+      localStorage.removeItem("bannedUntil");
+      attemptCount = 0;
     }
 
     // التحقق من كلمة المرور
@@ -401,15 +449,43 @@
           document.getElementById('order-container').style.display = 'block';
           loadOrders();
         } else {
-          showPasswordError(errorElement);
+          handleFailedAttempt(errorElement);
         }
-      }).catch(() => showPasswordError(errorElement));
+      }).catch(() => handleFailedAttempt(errorElement));
     }
 
-    function showPasswordError(element) {
-      element.textContent = "كلمة المرور غير صحيحة!";
+    // إدارة المحاولات الفاشلة
+    function handleFailedAttempt(element) {
+      attemptCount++;
+      
+      if(attemptCount >= MAX_ATTEMPTS) {
+        const bannedUntil = Date.now() + BAN_DURATION;
+        localStorage.setItem("bannedUntil", bannedUntil);
+        showMessage("تم حظرك لمدة دقيقة", "error");
+        disableLogin();
+        setTimeout(enableLogin, BAN_DURATION);
+      } else {
+        showPasswordError(element, MAX_ATTEMPTS - attemptCount);
+      }
+    }
+
+    function showPasswordError(element, remaining) {
+      element.textContent = `كلمة مرور خاطئة! لديك ${remaining} محاولات متبقية`;
       element.className = "alert show error";
       setTimeout(() => element.classList.remove("show"), 3000);
+    }
+
+    // تبديل رؤية كلمة المرور
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('admin-password');
+      const icon = document.querySelector('.toggle-password i');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
     }
 
     // وظائف إدارة الطلبات
@@ -452,25 +528,24 @@
                 <div class="order-field">
                   <strong>اسم الخدمة</strong>
                   ${order.serviceName}
-                </div>
-                <div class="order-field">
+                                  <div class="order-field">
                   <strong>المكان</strong>
                   ${order.location}
                 </div>
                 <div class="order-field">
-                  <strong>رقم التواصل</strong>
+                  <strong>رقم الواتساب</strong>
                   ${order.whatsapp}
                 </div>
                 <div class="order-field">
-                  <strong>التوقيت</strong>
+                  <strong>التاريخ والوقت</strong>
                   ${order.day} - ${order.time}
                 </div>
                 <div class="order-field">
-                  <strong>الإضافات</strong>
+                  <strong>الأدوات المطلوبة</strong>
                   ${order.equipment?.length ? order.equipment.join('، ') : 'لا يوجد'}
                 </div>
                 <div class="order-field">
-                  <strong>ملاحظات</strong>
+                  <strong>ملاحظات إضافية</strong>
                   ${order.other || 'لا يوجد'}
                 </div>
                 <button class="delete-btn" onclick="deleteOrder('${orderKey}')">
