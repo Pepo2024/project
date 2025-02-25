@@ -1,582 +1,839 @@
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام إدارة الطلبات</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  
-  <!-- مكتبات Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-  <style>
-    :root {
-      --primary-color: #2E86C1;
-      --secondary-color: #F4F6F7;
-      --text-color: #2C3E50;
-      --error-color: #E74C3C;
-      --success-color: #28a745;
-      --card-bg: #FFFFFF;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+<meta charset="UTF-8">
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: var(--secondary-color);
-      color: var(--text-color);
-      line-height: 1.6;
-    }
+<title>نظام إدارة الطلبات</title>
 
-    .container {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
-    .auth-card {
-      background: var(--card-bg);
-      border-radius: 1rem;
-      box-shadow: var(--shadow);
-      padding: 2.5rem;
-      max-width: 480px;
-      margin: 5rem auto;
-      transition: transform 0.3s ease;
-      text-align: center;
-    }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    .auth-card:hover {
-      transform: translateY(-5px);
-    }
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 
-    .auth-header {
-      margin-bottom: 2rem;
-    }
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-    .auth-header h2 {
-      color: var(--primary-color);
-      font-size: 1.8rem;
-      margin-bottom: 0.5rem;
-    }
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
 
-    .btn-primary {
-      width: 100%;
-      padding: 1rem;
-      background: linear-gradient(135deg, var(--primary-color), #6AA9FF);
-      color: white;
-      border: none;
-      border-radius: 0.5rem;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
+<style>
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(46, 134, 193, 0.3);
-    }
+:root {
 
-    .input-group {
-      margin-bottom: 1.5rem;
-      position: relative;
-    }
+--primary-color: #2E86C1;
 
-    .input-group input {
-      width: 100%;
-      padding: 1rem;
-      border: 2px solid #e0e0e0;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-    }
+--secondary-color: #F4F6F7;
 
-    .input-group input:focus {
-      border-color: var(--primary-color);
-      outline: none;
-    }
+--text-color: #2C3E50;
 
-    .toggle-password {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: var(--primary-color);
-    }
+--error-color: #E74C3C;
 
-    .orders-header {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      margin-bottom: 1rem;
-      padding: 1rem 0;
-      border-bottom: 2px solid #eee;
-    }
+--success-color: #28a745;
 
-    .orders-header h2 {
-      color: var(--primary-color);
-      margin-bottom: 0.5rem;
-    }
+--card-bg: #FFFFFF;
 
-    .order-count {
-      font-size: 1.1rem;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-    }
+--shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-    .orders-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
+}
 
-    .order-card {
-      background: var(--card-bg);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: var(--shadow);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      border-left: 4px solid var(--primary-color);
-      position: relative;
-      overflow: hidden;
-      animation: fadeInUp 0.5s ease;
-    }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .order-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
+body {
 
-    .order-summary {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-    }
+font-family: 'Cairo', sans-serif;
 
-    .order-summary h3 {
-      color: var(--primary-color);
-      font-size: 1.2rem;
-    }
+background: var(--secondary-color);
 
-    .order-summary .arrow {
-      font-size: 1.2rem;
-      transition: transform 0.3s ease;
-    }
+color: var(--text-color);
 
-    .order-details {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease, padding 0.3s ease;
-    }
+line-height: 1.6;
 
-    .order-details.open {
-      max-height: 600px;
-      padding-top: 1rem;
-    }
+}
 
-    .order-field {
-      margin-bottom: 1rem;
-      padding: 0.4rem 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
+.container {
 
-    .order-field strong {
-      color: var(--primary-color);
-      display: block;
-      margin-bottom: 0.3rem;
-      font-size: 0.9rem;
-    }
+max-width: 800px;
 
-    .empty-state {
-      text-align: center;
-      padding: 4rem;
-      background: var(--card-bg);
-      border-radius: 1rem;
-      box-shadow: var(--shadow);
-    }
+margin: 2rem auto;
 
-    .alert {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 1rem 2rem;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
-      z-index: 1000;
-      pointer-events: none;
-    }
+padding: 0 1rem;
 
-    .alert.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
+}
 
-    .alert.error {
-      background-color: var(--error-color);
-      color: #fff;
-      animation: shake 0.5s;
-    }
+.auth-card {
 
-    .alert.success {
-      background-color: var(--success-color);
-      color: #fff;
-    }
+background: var(--card-bg);
 
-    .delete-btn {
-      background: var(--error-color);
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 0.5rem;
-      margin-top: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: 'Cairo', sans-serif;
-      transition: background 0.3s ease;
-      float: left;
-    }
+border-radius: 1rem;
 
-    .delete-btn:hover {
-      background: #c0392b;
-    }
+box-shadow: var(--shadow);
 
-    @keyframes shake {
-      0%, 100% { transform: translateX(-50%) translateX(0); }
-      10%, 30%, 50%, 70%, 90% { transform: translateX(-50%) translateX(-10px); }
-      20%, 40%, 60%, 80% { transform: translateX(-50%) translateX(10px); }
-    }
+padding: 2.5rem;
 
-    @media (max-width: 768px) {
-      .container {
-        padding: 0 1rem;
-      }
+max-width: 480px;
 
-      .auth-card {
-        margin: 2rem auto;
-        padding: 1.5rem;
-      }
+margin: 5rem auto;
 
-      .orders-header {
-        align-items: flex-start;
-      }
-    }
+transition: transform 0.3s ease;
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  </style>
+text-align: center;
+
+}
+
+.auth-card:hover { transform: translateY(-5px); }
+
+.auth-header { margin-bottom: 2rem; }
+
+.auth-header h2 {
+
+color: var(--primary-color);
+
+font-size: 1.8rem;
+
+margin-bottom: 0.5rem;
+
+}
+
+.input-group {
+
+margin-bottom: 1.5rem;
+
+position: relative;
+
+}
+
+.input-group input {
+
+width: 100%;
+
+padding: 1rem 1rem 1rem 40px;
+
+border: 2px solid #e0e0e0;
+
+border-radius: 0.5rem;
+
+font-size: 1rem;
+
+transition: border-color 0.3s ease;
+
+}
+
+.input-group input:focus { border-color: var(--primary-color); outline: none; }
+
+.input-group .toggle-password {
+
+position: absolute;
+
+left: 10px;
+
+top: 50%;
+
+transform: translateY(-50%);
+
+cursor: pointer;
+
+color: var(--primary-color);
+
+}
+
+.btn-primary {
+
+width: 100%;
+
+padding: 1rem;
+
+background: linear-gradient(135deg, var(--primary-color), #6AA9FF);
+
+color: white;
+
+border: none;
+
+border-radius: 0.5rem;
+
+font-size: 1.1rem;
+
+font-weight: 600;
+
+cursor: pointer;
+
+transition: transform 0.2s, box-shadow 0.2s;
+
+}
+
+.btn-primary:hover {
+
+transform: translateY(-2px);
+
+box-shadow: 0 5px 15px rgba(46, 134, 193, 0.3);
+
+}
+
+.orders-header {
+
+display: flex;
+
+justify-content: space-between;
+
+align-items: center;
+
+margin-bottom: 2rem;
+
+padding: 1rem 0;
+
+border-bottom: 2px solid #eee;
+
+}
+
+.orders-list {
+
+display: flex;
+
+flex-direction: column;
+
+gap: 1rem;
+
+}
+
+.order-card {
+
+background: var(--card-bg);
+
+border-radius: 1rem;
+
+padding: 1.5rem;
+
+box-shadow: var(--shadow);
+
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+border-left: 4px solid var(--primary-color);
+
+position: relative;
+
+overflow: hidden;
+
+animation: fadeInUp 0.5s ease;
+
+}
+
+.order-card:hover {
+
+transform: translateY(-3px);
+
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+
+}
+
+.order-summary {
+
+display: flex;
+
+justify-content: space-between;
+
+align-items: center;
+
+cursor: pointer;
+
+}
+
+.order-summary h3 {
+
+color: var(--primary-color);
+
+font-size: 1.2rem;
+
+}
+
+.order-summary .arrow {
+
+font-size: 1.2rem;
+
+transition: transform 0.3s ease;
+
+}
+
+.order-details {
+
+max-height: 0;
+
+overflow: hidden;
+
+transition: max-height 0.3s ease, padding 0.3s ease;
+
+}
+
+.order-details.open {
+
+max-height: 600px;
+
+padding-top: 1rem;
+
+}
+
+.order-field {
+
+margin-bottom: 1rem;
+
+padding: 0.4rem 0;
+
+border-bottom: 1px solid #f0f0f0;
+
+}
+
+.order-field strong {
+
+color: var(--primary-color);
+
+display: block;
+
+margin-bottom: 0.3rem;
+
+font-size: 0.9rem;
+
+}
+
+.empty-state {
+
+text-align: center;
+
+padding: 4rem;
+
+background: var(--card-bg);
+
+border-radius: 1rem;
+
+box-shadow: var(--shadow);
+
+}
+
+.alert {
+
+position: fixed;
+
+top: 20px;
+
+left: 50%;
+
+transform: translateX(-50%);
+
+padding: 1rem 2rem;
+
+border-radius: 8px;
+
+box-shadow: var(--shadow);
+
+opacity: 0;
+
+transition: opacity 0.5s ease-in-out;
+
+z-index: 1000;
+
+pointer-events: none;
+
+}
+
+.alert.show {
+
+opacity: 1;
+
+pointer-events: auto;
+
+}
+
+.alert.error {
+
+background-color: var(--error-color);
+
+color: #fff;
+
+animation: shake 0.5s;
+
+}
+
+.alert.success {
+
+background-color: var(--success-color);
+
+color: #fff;
+
+}
+
+.delete-btn {
+
+background: var(--error-color);
+
+color: white;
+
+border: none;
+
+padding: 0.8rem 1.5rem;
+
+border-radius: 0.5rem;
+
+margin-top: 1rem;
+
+cursor: pointer;
+
+display: flex;
+
+align-items: center;
+
+gap: 0.5rem;
+
+font-family: 'Cairo', sans-serif;
+
+transition: background 0.3s ease;
+
+float: left;
+
+}
+
+.delete-btn:hover {
+
+background: #c0392b;
+
+}
+
+@keyframes shake {
+
+0% { transform: translateX(-50%) translateX(0); }
+
+10% { transform: translateX(-50%) translateX(-10px); }
+
+20% { transform: translateX(-50%) translateX(10px); }
+
+30% { transform: translateX(-50%) translateX(-10px); }
+
+40% { transform: translateX(-50%) translateX(10px); }
+
+50% { transform: translateX(-50%) translateX(-10px); }
+
+60% { transform: translateX(-50%) translateX(10px); }
+
+70% { transform: translateX(-50%) translateX(-10px); }
+
+80% { transform: translateX(-50%) translateX(10px); }
+
+90% { transform: translateX(-50%) translateX(-10px); }
+
+100% { transform: translateX(-50%) translateX(0); }
+
+}
+
+@media (max-width: 768px) {
+
+.container { padding: 0 1rem; }
+
+.auth-card { margin: 2rem auto; padding: 1.5rem; }
+
+.orders-header { flex-direction: column; align-items: flex-start; }
+
+}
+
+@keyframes fadeInUp {
+
+from { opacity: 0; transform: translateY(20px); }
+
+to { opacity: 1; transform: translateY(0); }
+
+}
+
+</style>
+
 </head>
+
 <body>
-  <div class="container">
-    <!-- واجهة تسجيل الدخول -->
-    <div class="auth-card" id="login-container">
-      <div class="auth-header">
-        <h2>مرحبًا بك في نظام الإدارة</h2>
-        <p>تسجيل الدخول باستخدام حساب جوجل</p>
-      </div>
-      <div class="alert" id="error-message"></div>
-      <button class="btn-primary" id="google-login">
-        <i class="fab fa-google"></i>
-        تسجيل الدخول باستخدام جوجل
-      </button>
-    </div>
 
-    <!-- صفحة كلمة المرور -->
-    <div id="password-container" style="display:none;">
-      <div class="auth-card">
-        <div class="auth-header">
-          <h2>مرحبًا مرة أخرى!</h2>
-          <p>الرجاء إدخال كلمة المرور الإدارية</p>
-        </div>
-        <div class="alert" id="password-error"></div>
-        <div class="input-group">
-          <input type="password" id="admin-password" placeholder="كلمة المرور الإدارية">
-          <span class="toggle-password" onclick="togglePasswordVisibility()">
-            <i class="fas fa-eye"></i>
-          </span>
-        </div>
-        <button class="btn-primary" onclick="checkPassword()">
-          <i class="fas fa-lock"></i>
-          تأكيد الدخول
-        </button>
-      </div>
-    </div>
+<div class="container">
 
-    <!-- واجهة إدارة الطلبات -->
-    <div id="order-container" style="display:none;">
-      <div class="orders-header">
-        <h2>الطلبات المقدمة</h2>
-        <p class="order-count">
-          عدد الطلبات الحالية: <span id="count">0</span>
-        </p>
-        <button class="btn-primary" onclick="location.reload()">تحديث البيانات</button>
-      </div>
-      <div class="orders-list" id="orders"></div>
-    </div>
-  </div>
+<div class="auth-card" id="login-container">
 
-  <!-- صوت الحذف -->
-  <audio id="delete-sound">
-    <source src="https://cdn.pixabay.com/download/audio/2022/11/14/audio_5a6c0c3a2a.mp3" type="audio/mpeg">
-  </audio>
+<div class="auth-header">
 
-  <script>
-    // تهيئة Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyD4NiKlU6SIJVxbnbk60SkRt8BNqlonk-U",
-      authDomain: "mina-project-c10b2.firebaseapp.com",
-      projectId: "mina-project-c10b2",
-      storageBucket: "mina-project-c10b2.firebasestorage.app",
-      messagingSenderId: "1088494592963",
-      appId: "1:1088494592963:web:de6a787bc3b1694ccd1376"
-    };
-    firebase.initializeApp(firebaseConfig);
+<h2>مرحبًا بك في نظام الإدارة</h2>
 
-    // متغيرات النظام
-    let attemptCount = 0;
-    const MAX_ATTEMPTS = 3;
-    const BAN_DURATION = 60000; // 1 دقيقة
+<p>الرجاء إدخال كلمة المرور للوصول</p>
 
-    // دالة كشف الجهاز
-    function isMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
+</div>
 
-    // تسجيل الدخول بجوجل
-    document.getElementById('google-login').addEventListener('click', () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      
-      if(isMobile()) {
-        firebase.auth().signInWithRedirect(provider);
-      } else {
-        firebase.auth().signInWithPopup(provider)
-          .catch(error => {
-            showMessage("فشل تسجيل الدخول: " + error.message, "error");
-          });
-      }
-    });
+<p id="order-count" style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary-color);">
 
-    // معالجة نتيجة التسجيل
-    firebase.auth().getRedirectResult().then(result => {
-      if(result.user) handleAuthSuccess();
-    }).catch(error => {
-      showMessage("فشل تسجيل الدخول: " + error.message, "error");
-    });
+عدد الطلبات الحالية: <span id="count">0</span>
 
-    // مراقبة حالة المصادقة
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        handleAuthSuccess();
-      } else {
-        showLoginPage();
-      }
-    });
+</p>
 
-    // التحكم في الواجهات
-    function handleAuthSuccess() {
-      document.getElementById('login-container').style.display = 'none';
-      document.getElementById('password-container').style.display = 'block';
-      checkBanStatus();
-    }
+<div class="alert" id="error-message"></div>
 
-    function showLoginPage() {
-      document.getElementById('login-container').style.display = 'block';
-      document.getElementById('password-container').style.display = 'none';
-      document.getElementById('order-container').style.display = 'none';
-    }
+<div class="input-group">
 
-    // التحقق من حالة الحظر
-    function checkBanStatus() {
-      const bannedUntil = localStorage.getItem("bannedUntil");
-      if (bannedUntil && Date.now() < bannedUntil) {
-        const remainingTime = bannedUntil - Date.now();
-        showMessage(`تم حظرك لمدة ${Math.ceil(remainingTime/1000)} ثانية`, "error");
-        disableLogin();
-        setTimeout(enableLogin, remainingTime);
-      }
-    }
+<input type="password" id="password" placeholder="كلمة المرور" autocomplete="current-password">
 
-    // تعطيل الواجهة
-    function disableLogin() {
-      document.getElementById('admin-password').disabled = true;
-      document.querySelector('#password-container button').disabled = true;
-    }
+<span class="toggle-password" onclick="togglePasswordVisibility()">
 
-    // تمكين الواجهة
-    function enableLogin() {
-      document.getElementById('admin-password').disabled = false;
-      document.querySelector('#password-container button').disabled = false;
-      localStorage.removeItem("bannedUntil");
-      attemptCount = 0;
-    }
+<i class="fas fa-eye"></i>
 
-    // التحقق من كلمة المرور
-    function checkPassword() {
-      const enteredPassword = document.getElementById('admin-password').value;
-      const errorElement = document.getElementById('password-error');
-      
-      firebase.database().ref("adminPassword").once("value").then(snapshot => {
-        const correctPassword = snapshot.val();
-        
-        if(enteredPassword === correctPassword) {
-          document.getElementById('password-container').style.display = 'none';
-          document.getElementById('order-container').style.display = 'block';
-          loadOrders();
-        } else {
-          handleFailedAttempt(errorElement);
-        }
-      }).catch(() => handleFailedAttempt(errorElement));
-    }
+</span>
 
-    // إدارة المحاولات الفاشلة
-    function handleFailedAttempt(element) {
-      attemptCount++;
-      
-      if(attemptCount >= MAX_ATTEMPTS) {
-        const bannedUntil = Date.now() + BAN_DURATION;
-        localStorage.setItem("bannedUntil", bannedUntil);
-        showMessage("تم حظرك لمدة دقيقة", "error");
-        disableLogin();
-        setTimeout(enableLogin, BAN_DURATION);
-      } else {
-        showPasswordError(element, MAX_ATTEMPTS - attemptCount);
-      }
-    }
+</div>
 
-    function showPasswordError(element, remaining) {
-      element.textContent = `كلمة مرور خاطئة! لديك ${remaining} محاولات متبقية`;
-      element.className = "alert show error";
-      setTimeout(() => element.classList.remove("show"), 3000);
-    }
+<button class="btn-primary" id="login-button">دخول إلى لوحة التحكم</button>
 
-    // تبديل رؤية كلمة المرور
-    function togglePasswordVisibility() {
-      const passwordInput = document.getElementById('admin-password');
-      const icon = document.querySelector('.toggle-password i');
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-      } else {
-        passwordInput.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-      }
-    }
+</div>
 
-    // وظائف إدارة الطلبات
-    function showMessage(message, type) {
-      const errorMessage = document.getElementById('error-message');
-      errorMessage.textContent = message;
-      errorMessage.className = "alert show " + type;
-      setTimeout(() => errorMessage.classList.remove("show"), 3000);
-    }
+<div id="order-container" style="display:none;">
 
-    function updateOrderCount() {
-      firebase.database().ref("orders").once("value").then(snapshot => {
-        document.getElementById('count').textContent = snapshot.numChildren();
-      });
-    }
+<div class="orders-header">
 
-    function loadOrders() {
-      const ordersDiv = document.getElementById('orders');
-      firebase.database().ref("orders").on("value", snapshot => {
-        if (!snapshot.exists()) {
-          ordersDiv.innerHTML = `
-            <div class="empty-state">
-              <h3>لا يوجد طلبات حالية</h3>
-              <p>سيظهر هنا أي طلبات جديدة يتم تقديمها</p>
-            </div>`;
-        } else {
-          ordersDiv.innerHTML = '';
-          snapshot.forEach(childSnapshot => {
-            const order = childSnapshot.val();
-            const orderKey = childSnapshot.key;
-            const orderCard = document.createElement('div');
-            orderCard.className = 'order-card';
-            orderCard.setAttribute('data-key', orderKey);
-            orderCard.innerHTML = `
-              <div class="order-summary" onclick="toggleDetails(this)">
-                <h3>طلب من: ${order.leader}</h3>
-                <span class="arrow"><i class="fas fa-chevron-down"></i></span>
-              </div>
-              <div class="order-details">
-                <div class="order-field">
-                  <strong>اسم الخدمة</strong>
-                  ${order.serviceName}
-                                  <div class="order-field">
-                  <strong>المكان</strong>
-                  ${order.location}
-                </div>
-                <div class="order-field">
-                  <strong>رقم الواتساب</strong>
-                  ${order.whatsapp}
-                </div>
-                <div class="order-field">
-                  <strong>التاريخ والوقت</strong>
-                  ${order.day} - ${order.time}
-                </div>
-                <div class="order-field">
-                  <strong>الأدوات المطلوبة</strong>
-                  ${order.equipment?.length ? order.equipment.join('، ') : 'لا يوجد'}
-                </div>
-                <div class="order-field">
-                  <strong>ملاحظات إضافية</strong>
-                  ${order.other || 'لا يوجد'}
-                </div>
-                <button class="delete-btn" onclick="deleteOrder('${orderKey}')">
-                  <i class="fas fa-trash"></i>
-                  حذف الطلب
-                </button>
-              </div>
-            `;
-            ordersDiv.appendChild(orderCard);
-          });
-        }
-        updateOrderCount();
-      });
-    }
+<h2>الطلبات المقدمة</h2>
 
-    function toggleDetails(element) {
-      const details = element.nextElementSibling;
-      const arrowIcon = element.querySelector('.arrow i');
-      details.classList.toggle('open');
-      arrowIcon.style.transform = details.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
+<button class="btn-primary" onclick="location.reload()">تحديث البيانات</button>
 
-    function deleteOrder(orderKey) {
-      if (confirm('هل أنت متأكد من رغبتك في حذف هذا الطلب؟')) {
-        const deleteSound = document.getElementById('delete-sound');
-        deleteSound.play();
-        firebase.database().ref("orders/" + orderKey).remove()
-          .then(() => showMessage('تم حذف الطلب بنجاح', 'success'))
-          .catch(() => showMessage('حدث خطأ أثناء الحذف', 'error'));
-      }
-    }
-  </script>
+</div>
+
+<div class="orders-list" id="orders"></div>
+
+</div>
+
+</div>
+
+<!-- صوت الحذف -->
+
+<audio id="delete-sound" src="https://cdn.pixabay.com/download/audio/2022/11/14/audio_5a6c0c3a2a.mp3"></audio>
+
+<script>
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyD4NiKlU6SIJVxbnbk60SkRt8BNqlonk-U",
+
+authDomain: "mina-project-c10b2.firebaseapp.com",
+
+projectId: "mina-project-c10b2",
+
+storageBucket: "mina-project-c10b2.firebasestorage.app",
+
+messagingSenderId: "1088494592963",
+
+appId: "1:1088494592963:web:de6a787bc3b1694ccd1376"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const messaging = firebase.messaging();
+
+messaging.usePublicVapidKey('BIr0VwRaBu2y2TPbs89jWg-DVpdW5czP_wWWnPucEb8Xs9MBW6Jjk9IhXEXCdhYE3zBIMCc0yLAokodRcjVCxCI');
+
+messaging.requestPermission()
+
+.then(() => messaging.getToken())
+
+.catch((err) => console.log('فشل الحصول على إذن الإشعارات:', err));
+
+messaging.onMessage((payload) => {
+
+if (Notification.permission === "granted") {
+
+new Notification(payload.notification.title, {
+
+body: payload.notification.body,
+
+icon: payload.notification.icon
+
+});
+
+}
+
+});
+
+let initialLoad = true;
+
+firebase.database().ref("orders").on("child_added", function() {
+
+if (!initialLoad && Notification.permission === "granted") {
+
+new Notification("طلب جديد", {
+
+body: "لقد وصل طلب جديد. يرجى التحقق من لوحة التحكم."
+
+});
+
+}
+
+});
+
+const loginButton = document.getElementById('login-button');
+
+const errorMessage = document.getElementById('error-message');
+
+const orderCountSpan = document.getElementById('count');
+
+let attemptCount = 0;
+
+const BAN_DURATION = 60000;
+
+function showMessage(message, type) {
+
+errorMessage.textContent = message;
+
+errorMessage.className = "alert show " + type;
+
+setTimeout(() => errorMessage.classList.remove("show"), 3000);
+
+}
+
+function checkBanStatus() {
+
+let bannedUntil = localStorage.getItem("bannedUntil");
+
+if (bannedUntil && Date.now() < parseInt(bannedUntil)) {
+
+loginButton.disabled = true;
+
+document.getElementById('password').disabled = true;
+
+setTimeout(() => {
+
+loginButton.disabled = false;
+
+document.getElementById('password').disabled = false;
+
+localStorage.removeItem("bannedUntil");
+
+attemptCount = 0;
+
+}, bannedUntil - Date.now());
+
+}
+
+}
+
+checkBanStatus();
+
+function updateOrderCount() {
+
+firebase.database().ref("orders").once("value").then(snapshot => {
+
+orderCountSpan.textContent = snapshot.numChildren();
+
+});
+
+}
+
+updateOrderCount();
+
+loginButton.addEventListener('click', function() {
+
+const password = document.getElementById('password').value.trim();
+
+if (password === '123') {
+
+document.getElementById('login-container').style.display = 'none';
+
+document.getElementById('order-container').style.display = 'block';
+
+loadOrders();
+
+} else {
+
+if (++attemptCount >= 3) {
+
+const banUntil = Date.now() + BAN_DURATION;
+
+localStorage.setItem("bannedUntil", banUntil);
+
+showMessage("تم حظرك لمدة دقيقة بسبب محاولات خاطئة", "error");
+
+loginButton.disabled = true;
+
+document.getElementById('password').disabled = true;
+
+setTimeout(() => {
+
+loginButton.disabled = false;
+
+document.getElementById('password').disabled = false;
+
+attemptCount = 0;
+
+}, BAN_DURATION);
+
+} else {
+
+showMessage("كلمة المرور غير صحيحة، الرجاء المحاولة مرة أخرى", "error");
+
+}
+
+}
+
+});
+
+function togglePasswordVisibility() {
+
+const passwordInput = document.getElementById('password');
+
+const toggleIcon = document.querySelector('.toggle-password i');
+
+passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+
+toggleIcon.classList.toggle('fa-eye-slash');
+
+}
+
+function loadOrders() {
+
+const ordersDiv = document.getElementById('orders');
+
+firebase.database().ref("orders").on("value", snapshot => {
+
+if (!snapshot.exists()) {
+
+ordersDiv.innerHTML = `
+
+<div class="empty-state">
+
+<h3>لا يوجد طلبات حالية</h3>
+
+<p>سيظهر هنا أي طلبات جديدة يتم تقديمها</p>
+
+</div>`;
+
+} else {
+
+ordersDiv.innerHTML = '';
+
+snapshot.forEach(childSnapshot => {
+
+const order = childSnapshot.val();
+
+const orderKey = childSnapshot.key;
+
+const orderCard = document.createElement('div');
+
+orderCard.className = 'order-card';
+
+orderCard.setAttribute('data-key', orderKey);
+
+orderCard.innerHTML = `
+
+<div class="order-summary" onclick="toggleDetails(this)">
+
+<h3>طلب من: ${order.leader}</h3>
+
+<span class="arrow"><i class="fas fa-chevron-down"></i></span>
+
+</div>
+
+<div class="order-details">
+
+<div class="order-field">
+
+<strong>اسم الخدمة</strong>
+
+${order.serviceName}
+
+</div>
+
+<div class="order-field">
+
+<strong>المكان</strong>
+
+${order.location}
+
+</div>
+
+<div class="order-field">
+
+<strong>رقم التواصل</strong>
+
+${order.whatsapp}
+
+</div>
+
+<div class="order-field">
+
+<strong>التوقيت</strong>
+
+${order.day} - ${order.time}
+
+</div>
+
+<div class="order-field">
+
+<strong>الإضافات</strong>
+
+${order.equipment?.length ? order.equipment.join('، ') : 'لا يوجد'}
+
+</div>
+
+<div class="order-field">
+
+<strong>ملاحظات</strong>
+
+${order.other || 'لا يوجد'}
+
+</div>
+
+<button class="delete-btn" onclick="deleteOrder('${orderKey}')">
+
+<i class="fas fa-trash"></i>
+
+حذف الطلب
+
+</button>
+
+</div>
+
+`;
+
+ordersDiv.appendChild(orderCard);
+
+});
+
+}
+
+updateOrderCount();
+
+});
+
+}
+
+function toggleDetails(element) {
+
+const details = element.nextElementSibling;
+
+const arrowIcon = element.querySelector('.arrow i');
+
+details.classList.toggle('open');
+
+arrowIcon.style.transform = details.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+
+}
+
+function deleteOrder(orderKey) {
+
+if (confirm('هل أنت متأكد من رغبتك في حذف هذا الطلب؟')) {
+
+const deleteSound = document.getElementById('delete-sound');
+
+deleteSound.play();
+
+firebase.database().ref("orders/" + orderKey).remove()
+
+.then(() => showMessage('تم حذف الطلب بنجاح', 'success'))
+
+.catch(() => showMessage('حدث خطأ أثناء الحذف', 'error'));
+
+}
+
+}
+
+</script>
+
 </body>
+
 </html>
