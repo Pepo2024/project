@@ -5,7 +5,7 @@ window.addEventListener('load', () => {
   }, 2000);
 });
 
-// تهيئة Firebase
+// تهيئة Firebase مع بيانات المشروع
 const firebaseConfig = {
   apiKey: "AIzaSyD4NiKlU6SIJVxbnbk60SkRt8BNqlonk-U",
   authDomain: "mina-project-c10b2.firebaseapp.com",
@@ -16,12 +16,12 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-// متغيرات النظام
+// متغيرات النظام للتعامل مع محاولات الدخول (يمكن استخدامها في حالة وجود قيود)
 let attemptCount = 0;
 const MAX_ATTEMPTS = 3;
 const BAN_DURATION = 60000; // 1 دقيقة
 
-// دالة كشف الجهاز
+// دالة التحقق من الجهاز (محمول أم لا)
 function isMobile() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
@@ -63,6 +63,7 @@ let confirmationResult; // لتخزين نتيجة التحقق
 
 function togglePhoneLogin() {
   const phoneForm = document.getElementById('phone-login-form');
+  // تغيير عرض نموذج تسجيل الدخول برقم الهاتف عند الضغط على الزر
   phoneForm.style.display = (phoneForm.style.display === 'none' || phoneForm.style.display === '') ? 'block' : 'none';
 }
 
@@ -72,10 +73,10 @@ function sendPhoneCode() {
     alert("الرجاء إدخال رقم الهاتف");
     return;
   }
-  // إعداد reCAPTCHA
+  // إعداد reCAPTCHA (يظهر بشكل غير مرئي)
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    'size': 'invisible',
-    'callback': function(response) {
+    size: 'invisible',
+    callback: function(response) {
       console.log("reCAPTCHA تم حله");
     }
   });
@@ -98,7 +99,7 @@ function verifyPhoneCode() {
   }
   confirmationResult.confirm(code)
     .then(function(result) {
-      // تم تسجيل الدخول بنجاح
+      // تم تسجيل الدخول بنجاح عبر رقم الهاتف
       handleAuthSuccess();
     })
     .catch(function(error) {
@@ -107,26 +108,26 @@ function verifyPhoneCode() {
 }
 
 // ============= معالجة حالة المصادقة =============
-firebase.auth().getRedirectResult().then(result => {
-  if(result.user) handleAuthSuccess();
-}).catch(error => {
-  showMessage("فشل تسجيل الدخول: " + error.message, "error");
-});
+// تمت إزالة التشغيل التلقائي لتسجيل الدخول عند دخول الصفحة
+// بحيث لا يتم تسجيل الدخول فوراً دون تدخل المستخدم.
+// يمكنك استخدام onAuthStateChanged لاحقًا في حال أردت تتبع حالة المصادقة.
+// firebase.auth().onAuthStateChanged(user => {
+//   if (user) {
+//     // يمكنك هنا عرض رسالة أو إعادة توجيه المستخدم
+//     // handleAuthSuccess();
+//   } else {
+//     // عرض واجهة تسجيل الدخول فقط عند الحاجة
+//   }
+// });
 
-firebase.auth().onAuthStateChanged(user => {
-  if (user) {
-    handleAuthSuccess();
-  } else {
-    // يمكنك عرض واجهة تسجيل الدخول أو أي منطق آخر هنا
-  }
-});
-
+// دالة معالجة نجاح تسجيل الدخول
 function handleAuthSuccess() {
-  closeLogin();
+  closeLogin(); // إغلاق نافذة تسجيل الدخول
   alert("تم تسجيل الدخول بنجاح!");
-  // يمكنك إعادة التوجيه أو تحديث الواجهة بما يتناسب مع حالة تسجيل الدخول
+  // يمكنك إعادة التوجيه أو تحديث الواجهة حسب متطلبات التطبيق هنا.
 }
 
+// دالة عرض الرسائل (مثال باستخدام alert)
 function showMessage(message, type) {
   alert(message);
 }
@@ -135,7 +136,7 @@ function showMessage(message, type) {
 let startY = 0;
 const splash = document.querySelector('.splash-screen');
 
-// التحكم بالسحب على الجوال
+// التحكم بالسحب على الجوال لإخفاء شاشة البداية
 document.addEventListener('touchstart', e => {
   startY = e.touches[0].clientY;
 });
@@ -147,14 +148,14 @@ document.addEventListener('touchmove', e => {
   }
 });
 
-// التحكم بالعجلة في الكمبيوتر
+// التحكم بالعجلة في الكمبيوتر لإخفاء شاشة البداية
 document.addEventListener('wheel', e => {
   if (e.deltaY < 0) {
     splash.classList.add('hidden');
   }
 });
 
-// النقر لإخفاء الشاشة
+// النقر لإخفاء شاشة البداية
 splash.addEventListener('click', () => {
   splash.classList.add('hidden');
 });
@@ -169,14 +170,13 @@ const verses = [
 ];
 
 let currentVerse = localStorage.getItem('currentVerse') || 0;
-
-// تحديث الآية تلقائياً كل دقيقة
+// تحديث الآية تلقائيًا كل دقيقة
 setInterval(() => {
   currentVerse = (parseInt(currentVerse) + 1) % verses.length;
   localStorage.setItem('currentVerse', currentVerse);
 }, 60000);
 
-// عرض الآية في المودال
+// دوال عرض وإخفاء الآيات في المودال
 function showVerse() {
   const modal = document.getElementById('verseModal');
   const content = document.getElementById('verseContent');
@@ -195,11 +195,11 @@ let currentX = 20;
 let currentY = window.innerHeight - 80;
 let initialX, initialY;
 
-// تحديد المواقع الأولية
+// تحديد المواقع الأولية للكرة
 draggableButton.style.left = currentX + 'px';
 draggableButton.style.top = currentY + 'px';
 
-// إضافة جميع Event Listeners
+// إضافة جميع Event Listeners لسحب الكرة
 draggableButton.addEventListener('mousedown', dragStart);
 draggableButton.addEventListener('touchstart', dragStart);
 document.addEventListener('mousemove', drag);
@@ -245,7 +245,7 @@ function dragEnd() {
   isDragging = false;
 }
 
-// النقر على الكرة لعرض الآية
+// عند النقر على الكرة يتم عرض المودال الخاص بالآية
 draggableButton.addEventListener('click', function(e) {
   if (!isDragging) {
     const modal = document.getElementById('verseModal');
@@ -300,15 +300,17 @@ updateThemeIcon();
 themeToggle.addEventListener('click', toggleTheme);
 
 // ============= نظام تسجيل الدخول =============
+// إظهار نافذة تسجيل الدخول عند الضغط على زر الدخول
 function showLogin() {
   document.getElementById('loginModal').style.display = 'block';
 }
 
+// إغلاق نافذة تسجيل الدخول
 function closeLogin() {
   document.getElementById('loginModal').style.display = 'none';
 }
 
-// إغلاق النافذة عند النقر خارجها
+// إغلاق نافذة تسجيل الدخول عند النقر خارجها
 window.onclick = function(e) {
   const loginModal = document.getElementById('loginModal');
   if (e.target === loginModal) {
@@ -323,18 +325,5 @@ document.querySelector('.email-login').addEventListener('submit', function(e) {
   const password = this.querySelector('input[type="password"]').value;
   
   console.log('جاري الدخول باستخدام:', email);
-  // أضف منطق المصادقة هنا
-});
-
-// ============= التحكم بالرسوم المتحركة =============
-// تحريك الأزرار عند التمرير
-window.addEventListener('scroll', () => {
-  const buttons = document.querySelectorAll('.btn');
-  buttons.forEach(btn => {
-    const btnTop = btn.getBoundingClientRect().top;
-    if (btnTop < window.innerHeight * 0.8) {
-      btn.style.opacity = '1';
-      btn.style.transform = 'translateY(0)';
-    }
-  });
+  // أضف هنا منطق المصادقة الخاص بك
 });
