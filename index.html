@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>كنيسة مارمينا العجايبي</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- مكتبات Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+  <!-- اللوجو في أعلى اليمين -->
+  <div class="top-right-logo">
+    <img src="mina.jpg" alt="شعار الكنيسة">
+    <span>St. Mina's Church</span>
+  </div> 
+  
+  <!-- زر القائمة الجانبية -->
+  <div class="menu-toggle">☰</div>
+
+  <!-- زر الدخول -->
+  <div class="login-btn" onclick="showLogin()">
+    <i class="fas fa-sign-in-alt"></i>
+  </div>
+
+  <!-- القائمة الجانبية -->
+  <div class="sidebar">
+    <ul class="menu-items">
+      <li>
+        <a href="https://youtube.com/channel/..." target="_blank">
+          <i class="fab fa-youtube"></i> قناة اليوتيوب
+        </a>
+      </li>
+      <li>
+        <a href="tel:01280440587">
+          <i class="fas fa-phone"></i> 01280440587
+        </a>
+      </li>
+      <li>
+        <a id="themeToggle">
+          <i class="fas fa-moon"></i> الوضع الليلي
+        </a>
+      </li>
+    </ul>
+    
+    <div class="sidebar-image">
+      <img src="Dark Mode.png" class="dark-image" alt="صورة الوضع الليلي">
+      <img src="Light Mode.png" class="light-image" alt="صورة الوضع النهاري">
+    </div>
+  </div>
+
+  <!-- نافذة تسجيل الدخول -->
+  <div class="login-modal" id="loginModal">
+    <div class="login-content">
+      <span class="close-login" onclick="closeLogin()">&times;</span>
+      <h2>تسجيل الدخول</h2>
+      <div class="social-login">
+        <button class="google-btn" id="google-login" onclick="googleLogin()">
+          <i class="fab fa-google"></i> الدخول بجوجل
+        </button>
+        <button class="facebook-btn" id="facebook-login" onclick="facebookLogin()">
+          <i class="fab fa-facebook-f"></i> الدخول بفيسبوك
+        </button>
+        <button class="phone-btn" id="phone-login-btn" onclick="togglePhoneLogin()">
+          <i class="fas fa-phone"></i> الدخول برقم الهاتف
+        </button>
+      </div>
+      <div class="or-divider">
+        <span>أو</span>
+      </div>
+      <form class="email-login">
+        <input type="email" placeholder="البريد الإلكتروني" required>
+        <input type="password" placeholder="كلمة المرور" required>
+        <button type="submit">الدخول</button>
+      </form>
+      <!-- نموذج تسجيل الدخول برقم الهاتف -->
+      <div class="phone-login" id="phone-login-form" style="display:none; margin-top:1rem;">
+        <input type="text" id="phone-number" placeholder="أدخل رقم الهاتف" required style="width:100%; padding:1rem; margin-bottom:1rem; border:2px solid var(--accent-color); border-radius:8px; background: transparent; color: var(--text-color); font-size:1rem;">
+        <div id="recaptcha-container"></div>
+        <button type="button" onclick="sendPhoneCode()" style="width:100%; padding:1rem; background: var(--accent-color); color: var(--primary-color); border:none; border-radius:8px; font-size:1.1rem; margin-bottom:1rem; cursor:pointer;">أرسل رمز التحقق</button>
+        <input type="text" id="verification-code" placeholder="أدخل رمز التحقق" required style="width:100%; padding:1rem; margin-bottom:1rem; border:2px solid var(--accent-color); border-radius:8px; background: transparent; color: var(--text-color); font-size:1rem;">
+        <button type="button" onclick="verifyPhoneCode()" style="width:100%; padding:1rem; background: var(--accent-color); color: var(--primary-color); border:none; border-radius:8px; font-size:1.1rem; cursor:pointer;">تأكيد</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- باقي المحتوي -->
+  <div class="loader">
+    <div class="loading-dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <div class="splash-screen">
+    <img src="mina.jpg" class="church-logo" alt="شعار الكنيسة">
+    <div class="splash-text">
+      <h1>St. Mina's Church</h1>
+      <h2>كنيسة مارمينا العجايبي</h2>
+    </div>
+    <div class="swipe-up">
+      <i class="fas fa-arrow-up"></i>
+      <p>اسحب للأعلى للدخول</p>
+    </div>
+  </div>
+
+  <div class="floating-button" id="draggableButton">
+    <img src="book1.jpg" alt="آية">
+  </div>
+
+  <div class="verse-modal" id="verseModal">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <div class="verse-content" id="verseContent"></div>
+  </div>
+
+  <header>
+    <h1>خدمه من القلب للقلب ❤️</h1>
+  </header>
+
+  <div class="buttons">
+    <button class="btn" onclick="window.location.href='service.html'">خدمة وسائل الإيضاح</button>
+    <button class="btn" onclick="window.location.href='reservation.html'">حجز الاعترافات</button>
+    <button class="btn" onclick="window.location.href='events.html'">المناسبات والمواعيد</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
