@@ -5,7 +5,6 @@
     --text-color: #ffffff;
   }
   
-  /* تخصيص الثيم الفاتح */
   [data-theme="light"] {
     --primary-color: #f0f4f8;
     --secondary-color: #ffffff;
@@ -13,7 +12,7 @@
     --accent-color: #2b5c50;
   }
   
-  /* إعادة تعيين الأنماط العامة */
+  /* الأنماط العامة */
   * {
     margin: 0;
     padding: 0;
@@ -29,7 +28,7 @@
     transition: background 0.3s, color 0.3s;
   }
   
-  /* شعار أعلى اليمين */
+  /* شريط اللوجو العلوي */
   .top-right-logo {
     position: fixed;
     top: 10px;
@@ -94,7 +93,6 @@
     border-radius: 8px;
   }
   
-  /* زر القائمة */
   .menu-toggle {
     position: fixed;
     top: 20px;
@@ -205,22 +203,7 @@
     font-size: 1.1rem;
   }
   
-  @keyframes fadeInUp {
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes bounceArrow {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-25px); }
-    60% { transform: translateY(-15px); }
-  }
-  
-  /* زر عائم */
+  /* زر العائمة */
   .floating-button {
     position: fixed;
     left: 20px;
@@ -288,7 +271,7 @@
     font-size: 1.5rem;
   }
   
-  /* العنوان والأزرار الرئيسية */
+  /* الأزرار الرئيسية */
   header {
     padding: 2rem 1rem;
     text-align: center;
@@ -372,14 +355,11 @@
     z-index: 2000;
   }
   
-  .login-modal.active {
-    display: block;
-  }
-  
+  /* تعديل صفحة التسجيل لإضافة شريط تمرير */
   .login-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    position: relative;
+    margin-right: -32%;
+    margin-top: 70%;
     transform: translate(-50%, -50%);
     background: var(--secondary-color);
     padding: 2rem;
@@ -387,6 +367,9 @@
     max-width: 400px;
     width: 90%;
     border: 2px solid var(--accent-color);
+    /* خصائص التمرير */
+    max-height: 80vh;
+    overflow-y: auto;
   }
   
   .login-content h2 {
@@ -401,9 +384,7 @@
     gap: 1rem;
   }
   
-  .google-btn,
-  .facebook-btn,
-  .phone-btn {
+  .google-btn, .facebook-btn, .phone-btn {
     padding: 1rem;
     border: none;
     border-radius: 8px;
@@ -429,9 +410,7 @@
     background: #34a853;
   }
   
-  .google-btn:hover,
-  .facebook-btn:hover,
-  .phone-btn:hover {
+  .google-btn:hover, .facebook-btn:hover, .phone-btn:hover {
     transform: translateY(-2px);
   }
   
@@ -524,27 +503,23 @@
     display: block;
   }
   
-  /* التصميم المتجاوب */
-  
-  /* شاشات اللاب توب (حتى 1024px) */
-  @media (max-width: 1024px) {
-    body {
-      font-size: 18px;
-    }
-    .church-logo {
-      width: 230px;
-      height: 230px;
-    }
-    header h1 {
-      font-size: 2rem;
-    }
-    .btn {
-      padding: 1.8rem;
-      font-size: 1.3rem;
-    }
+  /* الأنيميشنات */
+  @keyframes fadeInUp {
+    to { opacity: 1; transform: translateY(0); }
   }
   
-  /* الأجهزة اللوحية والمتوسطة (حتى 768px) */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes bounceArrow {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-25px); }
+    60% { transform: translateY(-15px); }
+  }
+  
+  /* التصميم المتجاوب */
   @media (max-width: 768px) {
     .church-logo {
       width: 220px;
@@ -563,19 +538,11 @@
     header h1 {
       font-size: 2rem;
     }
-    .sidebar {
-      width: 250px;
-      right: -250px;
-    }
-    .sidebar.active {
-      right: 0;
-    }
   }
   
-  /* الهواتف الصغيرة (حتى 480px) */
   @media (max-width: 480px) {
     body {
-      font-size: 16px;
+      font-size: 18px;
     }
     .church-logo {
       width: 200px;
@@ -594,9 +561,8 @@
     header h1 {
       font-size: 1.6rem;
     }
-    .login-content {
-      width: 95%;
-      padding: 1.5rem;
+    .sidebar {
+      width: 250px;
     }
   }
   
