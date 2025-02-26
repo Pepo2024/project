@@ -355,20 +355,18 @@
     z-index: 2000;
   }
   
-  /* تعديل صفحة التسجيل لإضافة شريط تمرير */
   .login-content {
-    position: relative;
-    margin-right: -32%;
-    margin-top: 70%;
-    transform: translate(-50%, -50%);
+    position: fixed;           /* استخدام fixed لضمان بقاء النافذة في مكانها */
+    top: 50%;                  /* تعيين موضع أعلى الصفحة 50% */
+    left: 50%;                 /* تعيين موضع اليسار 50% */
+    transform: translate(-50%, -50%); /* تحويل العنصر ليصبح في المنتصف تمامًا */
     background: var(--secondary-color);
     padding: 2rem;
     border-radius: 15px;
     max-width: 400px;
     width: 90%;
     border: 2px solid var(--accent-color);
-    /* خصائص التمرير */
-    max-height: 80vh;
+    max-height: 80vh;          /* تحديد ارتفاع أقصى مع شريط تمرير عند الحاجة */
     overflow-y: auto;
   }
   
