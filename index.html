@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>كنيسة مارمينا العجايبي</title>
+  <!-- استدعاء مكتبة Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- ربط ملف CSS -->
   <link rel="stylesheet" href="style.css">
 
   <!-- مكتبات Firebase -->
@@ -18,15 +20,12 @@
     <img src="mina.jpg" alt="شعار الكنيسة">
     <span>St. Mina's Church</span>
   </div> 
-  
   <!-- زر القائمة الجانبية -->
   <div class="menu-toggle">☰</div>
-
   <!-- زر الدخول -->
   <div class="login-btn" onclick="showLogin()">
     <i class="fas fa-sign-in-alt"></i>
   </div>
-
   <!-- القائمة الجانبية -->
   <div class="sidebar">
     <ul class="menu-items">
@@ -46,13 +45,11 @@
         </a>
       </li>
     </ul>
-    
     <div class="sidebar-image">
       <img src="Dark Mode.png" class="dark-image" alt="صورة الوضع الليلي">
       <img src="Light Mode.png" class="light-image" alt="صورة الوضع النهاري">
     </div>
   </div>
-
   <!-- نافذة تسجيل الدخول -->
   <div class="login-modal" id="loginModal">
     <div class="login-content">
@@ -87,7 +84,6 @@
       </div>
     </div>
   </div>
-
   <!-- باقي المحتوي -->
   <div class="loader">
     <div class="loading-dots">
@@ -97,7 +93,6 @@
       <div class="dot"></div>
     </div>
   </div>
-
   <div class="splash-screen">
     <img src="mina.jpg" class="church-logo" alt="شعار الكنيسة">
     <div class="splash-text">
@@ -109,26 +104,22 @@
       <p>اسحب للأعلى للدخول</p>
     </div>
   </div>
-
   <div class="floating-button" id="draggableButton">
     <img src="book1.jpg" alt="آية">
   </div>
-
   <div class="verse-modal" id="verseModal">
     <span class="close-btn" onclick="closeModal()">&times;</span>
     <div class="verse-content" id="verseContent"></div>
   </div>
-
   <header>
     <h1>خدمه من القلب للقلب ❤️</h1>
   </header>
-
   <div class="buttons">
     <button class="btn" onclick="window.location.href='service.html'">خدمة وسائل الإيضاح</button>
     <button class="btn" onclick="window.location.href='reservation.html'">حجز الاعترافات</button>
     <button class="btn" onclick="window.location.href='events.html'">المناسبات والمواعيد</button>
   </div>
-
+  <!-- ربط ملف JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>
