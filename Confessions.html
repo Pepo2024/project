@@ -27,6 +27,7 @@
       background-color: var(--background-color);
       color: var(--text-color);
       line-height: 1.6;
+      zoom: 0.80; /* تكبير الصفحة بنسبة 80% */
     }
     
     /* هيدر الصفحة المعدل */
@@ -268,14 +269,14 @@
   <header class="header">
     <div class="header-quote">
       "لاَ تَسْتَحِي أَنْ تَعْتَرِفَ بِخَطَايَاكَ،<br>
-      وَلاَ تُغَالِبْ مَجْرَى النَّهْرِ"<br>
-      (سفر يشوع بن سيراخ 4: 31)
+      وَلاَ تُغَالِبْ مَجْرَى النَّهْرِ" ...........<br>
+      (سفر يشوع بن سيراخ 4: 31) 
     </div>
     <div class="shape"></div>
     <div class="shape shape-2"></div>
     <div class="header-content">
       <img src="logo.png" alt="شعار الكنيسة" class="logo">
-      <h1 class="site-title">مواعيد الاعترافات</h1>
+      <h1 class="site-title">مواعيد الاعترافات✝️</h1>
     </div>
   </header>
   
@@ -284,16 +285,13 @@
     <div class="card">
       <div class="card-header">
         <div class="priest-info">
-          <!-- تغليف الصورة داخل الحاوية مع الإضافات -->
           <div class="photo-container">
             <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
             <i class="fas fa-xmark extra-icon cross-icon"></i>
             <i class="fas fa-plus extra-icon plus-icon"></i>
-            <i class="fas fa-xmark extra-icon cross-icon"></i>
-            <i class="fas fa-plus extra-icon plus-icon"></i>
           </div>
           <div>
-            <h2 class="priest-name">ابونا ابانوب</h2>
+            <h2 class="priest-name">أبونا صومائيل</h2>
             <p>كنيسة الشهيد العظيم مارمينا</p>
           </div>
         </div>
@@ -328,63 +326,17 @@
       </div>
     </div>
     
-    <!-- تكرار بطاقات أخرى بنفس النمط -->
+    <!-- بطاقة ثانية -->
     <div class="card">
       <div class="card-header">
         <div class="priest-info">
-          <!-- تغليف الصورة داخل الحاوية مع الإضافات -->
           <div class="photo-container">
             <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
             <i class="fas fa-xmark extra-icon cross-icon"></i>
             <i class="fas fa-plus extra-icon plus-icon"></i>
           </div>
           <div>
-            <h2 class="priest-name">ابونا ابانوب</h2>
-            <p>كنيسة الشهيد العظيم مارمينا</p>
-          </div>
-        </div>
-        <button class="toggle-details" onclick="toggleDetails(this)">
-          <span>المزيد</span>
-          <i class="fas fa-chevron-down arrow"></i>
-        </button>
-      </div>
-      <div class="card-details">
-        <div class="detail-item">
-          <i class="fas fa-clock"></i>
-          <div>
-            <h4>المواعيد:</h4>
-            <p>السبت - الأربعاء: ٥ مساءً - ٨ مساءً</p>
-            <p>الجمعة: ٣ عصرًا - ٦ مساءً</p>
-          </div>
-        </div>
-        <div class="detail-item">
-          <i class="fas fa-phone"></i>
-          <div>
-            <h4>الاتصال:</h4>
-            <p>+20 123 456 7890</p>
-          </div>
-        </div>
-        <div class="detail-item">
-          <i class="fas fa-map-marker-alt"></i>
-          <div>
-            <h4>العنوان:</h4>
-            <p>شارع الكنيسة، المعادي، القاهرة</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="card">
-      <div class="card-header">
-        <div class="priest-info">
-          <!-- تغليف الصورة داخل الحاوية مع الإضافات -->
-          <div class="photo-container">
-            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
-            <i class="fas fa-xmark extra-icon cross-icon"></i>
-            <i class="fas fa-plus extra-icon plus-icon"></i>
-          </div>
-          <div>
-            <h2 class="priest-name">ابونا ابانوب</h2>
+            <h2 class="priest-name">أبونا فريك</h2>
             <p>كنيسة الشهيد العظيم مارمينا</p>
           </div>
         </div>
@@ -422,14 +374,13 @@
     <div class="card">
       <div class="card-header">
         <div class="priest-info">
-          <!-- تغليف الصورة داخل الحاوية مع الإضافات -->
           <div class="photo-container">
             <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
             <i class="fas fa-xmark extra-icon cross-icon"></i>
             <i class="fas fa-plus extra-icon plus-icon"></i>
           </div>
           <div>
-            <h2 class="priest-name">ابونا ابانوب</h2>
+            <h2 class="priest-name">أبونا جرجس</h2>
             <p>كنيسة الشهيد العظيم مارمينا</p>
           </div>
         </div>
@@ -464,7 +415,6 @@
       </div>
     </div>
     
-    <!-- تكرار بطاقات أخرى بنفس النمط -->
     <div class="card">
       <div class="card-header">
         <div class="priest-info">
@@ -474,7 +424,51 @@
             <i class="fas fa-plus extra-icon plus-icon"></i>
           </div>
           <div>
-            <h2 class="priest-name">ابونا ابانوب</h2>
+            <h2 class="priest-name">أبونا شاروبيم</h2>
+            <p>كنيسة الشهيد العظيم مارمينا</p>
+          </div>
+        </div>
+        <button class="toggle-details" onclick="toggleDetails(this)">
+          <span>المزيد</span>
+          <i class="fas fa-chevron-down arrow"></i>
+        </button>
+      </div>
+      <div class="card-details">
+        <div class="detail-item">
+          <i class="fas fa-clock"></i>
+          <div>
+            <h4>المواعيد:</h4>
+            <p>السبت - الأربعاء: ٥ مساءً - ٨ مساءً</p>
+            <p>الجمعة: ٣ عصرًا - ٦ مساءً</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-phone"></i>
+          <div>
+            <h4>الاتصال:</h4>
+            <p>+20 123 456 7890</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>العنوان:</h4>
+            <p>شارع الكنيسة، المعادي، القاهرة</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <div class="priest-info">
+          <div class="photo-container">
+            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <i class="fas fa-xmark extra-icon cross-icon"></i>
+            <i class="fas fa-plus extra-icon plus-icon"></i>
+          </div>
+          <div>
+            <h2 class="priest-name">أبونا ابانوب</h2>
             <p>كنيسة الشهيد العظيم مارمينا</p>
           </div>
         </div>
@@ -510,10 +504,6 @@
     </div>
     
   </main>
-  
-  <footer>
-    جميع الحقوق محفوظة © 2024
-  </footer>
   
   <script>
     function toggleDetails(button) {
