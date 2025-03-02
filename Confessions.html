@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مواعيد الاعترافات</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #2A5C82;
+      --secondary-color: #5A8BAD;
+      --accent-color: #F2A541;
+      --text-color: #333;
+      --background-color: #f9f9f9;
+      --card-bg: #fff;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', sans-serif;
+    }
+    
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    /* هيدر الصفحة المعدل */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      padding: 1rem; /* تصغير حجم الهيدر */
+      position: relative;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* الاقتباس في الهيدر على الشمال، بخط أكبر وتحت بعض */
+    .header-quote {
+      position: absolute;
+      top: 35%;
+      left: 20px;
+      transform: translateY(-50%);
+      font-size: 1.4rem;
+      color:#f3cbcb;
+      max-width: 300px;
+      line-height: 1.3;
+      text-align: left;
+    }
+    
+    /* أشكال زخرفية في الهيدر */
+    .shape {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 80px;
+      height: 80px;
+      background: #989a346e;
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+      opacity: 0.5;
+    }
+    .shape-2 {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 60px;
+      height: 60px;
+      background: var(--secondary-color);
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+    
+    /* محتوى الهيدر (اللوجو والاسم) */
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .logo {
+      max-width: 140px; /* تصغير اللوجو */
+      margin-bottom: 0.5rem;
+      align-self: flex-end;
+      margin-left: 70%;
+    }
+    .site-title {
+      font-size: 2rem; /* تصغير حجم الاسم */
+      color: #f3cbcb;
+    }
+    
+    /* حاوية البطاقات */
+    .container {
+      max-width: 1300px;
+      margin: 3rem auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    /* تصميم البطاقة */
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    /* تكبير الصورة والاسم عند تحويم البطاقة (مع الدائرة والأيقونات) */
+    .card:hover .priest-photo,
+    .card:hover .priest-name,
+    .card:hover .photo-container::before,
+    .card:hover .extra-icon {
+      transform: scale(1.1);
+      transition: transform 0.3s ease;
+    }
+    
+    /* رأس البطاقة */
+    .card-header {
+      padding: 1.5rem;
+      background: var(--primary-color);
+      color: #fff;
+      position: relative;
+      padding-bottom: 3.5rem;
+    }
+    .priest-info {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    
+    /* تغليف الصورة داخل حاوية لإضافة الدائرة والأيقونات */
+    .photo-container {
+      position: relative;
+      display: inline-block;
+    }
+    /* الدائرة الخلفية للصورة باستخدام pseudo-element */
+    .photo-container::before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      width: 220px;
+      height: 220px;
+      background: var(--accent-color);
+      border-radius: 50%;
+      z-index: 0;
+      transition: transform 0.3s ease;
+    }
+    /* الصورة مع إضافة ظل تحتها */
+    .priest-photo {
+      transform: translateX(45px);
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s ease;
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    }
+    /* الأيقونات الإضافية التي تتحرك مع الصورة */
+    .extra-icon {
+      position: absolute;
+      color: #fff;
+      font-size: 1.5rem;
+      z-index: 2;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 0.8;
+    }
+    /* أيقونة الصليب */
+    .cross-icon {
+      top: 10%;
+      left: 10%;
+    }
+    /* أيقونة الزائد */
+    .plus-icon {
+      bottom: 10%;
+      right: 10%;
+    }
+    @media (max-width: 768px) {
+      .photo-container::before {
+        width: 170px;
+        height: 170px;
+      }
+    }
+    .priest-name {
+      transform: translateX(-15px);
+      font-size: 1.6rem;
+      font-weight: 700;
+      transition: transform 0.3s ease;
+    }
+    
+    /* زر التفاصيل */
+    .toggle-details {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.15);
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 25px;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: background 0.3s ease;
+    }
+    .toggle-details:hover {
+      background: rgba(255,255,255,0.25);
+    }
+    .arrow {
+      transition: transform 0.3s ease;
+    }
+    .arrow.expanded {
+      transform: rotate(180deg);
+    }
+    
+    /* تفاصيل البطاقة */
+    .card-details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease, padding 0.5s ease;
+      padding: 0 1.5rem;
+    }
+    .card-details.expanded {
+      max-height: 500px;
+      padding: 1.5rem;
+    }
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .detail-item i {
+      color: var(--secondary-color);
+      font-size: 1.2rem;
+    }
+    
+    footer {
+      background: #ddd;
+      padding: 1.5rem;
+      text-align: center;
+      margin-top: 3rem;
+    }
+    @media (max-width: 768px) {
+      .card-header {
+        padding-bottom: 4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-quote">
+      "لاَ تَسْتَحِي أَنْ تَعْتَرِفَ بِخَطَايَاكَ،<br>
+      وَلاَ تُغَالِبْ مَجْرَى النَّهْرِ"<br>
+      (سفر يشوع بن سيراخ 4: 31)
+    </div>
+    <div class="shape"></div>
+    <div class="shape shape-2"></div>
+    <div class="header-content">
+      <img src="logo.png" alt="شعار الكنيسة" class="logo">
+      <h1 class="site-title">مواعيد الاعترافات</h1>
+    </div>
+  </header>
+  
+  <main class="container">
+    <!-- البطاقة الأولى -->
+    <div class="card">
+      <div class="card-header">
+        <div class="priest-info">
+          <!-- تغليف الصورة داخل الحاوية مع الإضافات -->
+          <div class="photo-container">
+            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <i class="fas fa-xmark extra-icon cross-icon"></i>
+            <i class="fas fa-plus extra-icon plus-icon"></i>
+            <i class="fas fa-xmark extra-icon cross-icon"></i>
+            <i class="fas fa-plus extra-icon plus-icon"></i>
+          </div>
+          <div>
+            <h2 class="priest-name">ابونا ابانوب</h2>
+            <p>كنيسة الشهيد العظيم مارمينا</p>
+          </div>
+        </div>
+        <button class="toggle-details" onclick="toggleDetails(this)">
+          <span>المزيد</span>
+          <i class="fas fa-chevron-down arrow"></i>
+        </button>
+      </div>
+      <div class="card-details">
+        <div class="detail-item">
+          <i class="fas fa-clock"></i>
+          <div>
+            <h4>المواعيد:</h4>
+            <p>السبت - الأربعاء: ٥ مساءً - ٨ مساءً</p>
+            <p>الجمعة: ٣ عصرًا - ٦ مساءً</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-phone"></i>
+          <div>
+            <h4>الاتصال:</h4>
+            <p>+20 123 456 7890</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>العنوان:</h4>
+            <p>شارع الكنيسة، المعادي، القاهرة</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- تكرار بطاقات أخرى بنفس النمط -->
+    <div class="card">
+      <div class="card-header">
+        <div class="priest-info">
+          <!-- تغليف الصورة داخل الحاوية مع الإضافات -->
+          <div class="photo-container">
+            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <i class="fas fa-xmark extra-icon cross-icon"></i>
+            <i class="fas fa-plus extra-icon plus-icon"></i>
+          </div>
+          <div>
+            <h2 class="priest-name">ابونا ابانوب</h2>
+            <p>كنيسة الشهيد العظيم مارمينا</p>
+          </div>
+        </div>
+        <button class="toggle-details" onclick="toggleDetails(this)">
+          <span>المزيد</span>
+          <i class="fas fa-chevron-down arrow"></i>
+        </button>
+      </div>
+      <div class="card-details">
+        <div class="detail-item">
+          <i class="fas fa-clock"></i>
+          <div>
+            <h4>المواعيد:</h4>
+            <p>السبت - الأربعاء: ٥ مساءً - ٨ مساءً</p>
+            <p>الجمعة: ٣ عصرًا - ٦ مساءً</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-phone"></i>
+          <div>
+            <h4>الاتصال:</h4>
+            <p>+20 123 456 7890</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>العنوان:</h4>
+            <p>شارع الكنيسة، المعادي، القاهرة</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <div class="priest-info">
+          <!-- تغليف الصورة داخل الحاوية مع الإضافات -->
+          <div class="photo-container">
+            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <i class="fas fa-xmark extra-icon cross-icon"></i>
+            <i class="fas fa-plus extra-icon plus-icon"></i>
+          </div>
+          <div>
+            <h2 class="priest-name">ابونا ابانوب</h2>
+            <p>كنيسة الشهيد العظيم مارمينا</p>
+          </div>
+        </div>
+        <button class="toggle-details" onclick="toggleDetails(this)">
+          <span>المزيد</span>
+          <i class="fas fa-chevron-down arrow"></i>
+        </button>
+      </div>
+      <div class="card-details">
+        <div class="detail-item">
+          <i class="fas fa-clock"></i>
+          <div>
+            <h4>المواعيد:</h4>
+            <p>السبت - الأربعاء: ٥ مساءً - ٨ مساءً</p>
+            <p>الجمعة: ٣ عصرًا - ٦ مساءً</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-phone"></i>
+          <div>
+            <h4>الاتصال:</h4>
+            <p>+20 123 456 7890</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>العنوان:</h4>
+            <p>شارع الكنيسة، المعادي، القاهرة</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <div class="priest-info">
+          <!-- تغليف الصورة داخل الحاوية مع الإضافات -->
+          <div class="photo-container">
+            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <i class="fas fa-xmark extra-icon cross-icon"></i>
+            <i class="fas fa-plus extra-icon plus-icon"></i>
+          </div>
+          <div>
+            <h2 class="priest-name">ابونا ابانوب</h2>
+            <p>كنيسة الشهيد العظيم مارمينا</p>
+          </div>
+        </div>
+        <button class="toggle-details" onclick="toggleDetails(this)">
+          <span>المزيد</span>
+          <i class="fas fa-chevron-down arrow"></i>
+        </button>
+      </div>
+      <div class="card-details">
+        <div class="detail-item">
+          <i class="fas fa-clock"></i>
+          <div>
+            <h4>المواعيد:</h4>
+            <p>السبت - الأربعاء: ٥ مساءً - ٨ مساءً</p>
+            <p>الجمعة: ٣ عصرًا - ٦ مساءً</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-phone"></i>
+          <div>
+            <h4>الاتصال:</h4>
+            <p>+20 123 456 7890</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>العنوان:</h4>
+            <p>شارع الكنيسة، المعادي، القاهرة</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- تكرار بطاقات أخرى بنفس النمط -->
+    <div class="card">
+      <div class="card-header">
+        <div class="priest-info">
+          <div class="photo-container">
+            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <i class="fas fa-xmark extra-icon cross-icon"></i>
+            <i class="fas fa-plus extra-icon plus-icon"></i>
+          </div>
+          <div>
+            <h2 class="priest-name">ابونا ابانوب</h2>
+            <p>كنيسة الشهيد العظيم مارمينا</p>
+          </div>
+        </div>
+        <button class="toggle-details" onclick="toggleDetails(this)">
+          <span>المزيد</span>
+          <i class="fas fa-chevron-down arrow"></i>
+        </button>
+      </div>
+      <div class="card-details">
+        <div class="detail-item">
+          <i class="fas fa-clock"></i>
+          <div>
+            <h4>المواعيد:</h4>
+            <p>السبت - الأربعاء: ٥ مساءً - ٨ مساءً</p>
+            <p>الجمعة: ٣ عصرًا - ٦ مساءً</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-phone"></i>
+          <div>
+            <h4>الاتصال:</h4>
+            <p>+20 123 456 7890</p>
+          </div>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>العنوان:</h4>
+            <p>شارع الكنيسة، المعادي، القاهرة</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </main>
+  
+  <footer>
+    جميع الحقوق محفوظة © 2024
+  </footer>
+  
+  <script>
+    function toggleDetails(button) {
+      const card = button.closest('.card');
+      const details = card.querySelector('.card-details');
+      const arrow = button.querySelector('.arrow');
+      details.classList.toggle('expanded');
+      arrow.classList.toggle('expanded');
+    }
+  </script>
+</body>
+</html>
