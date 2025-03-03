@@ -3,15 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>الموقع الرسمي - مواعيد الكنيسة</title>
+  <title>موقع- مواعيد الكنيسة</title>
   <style>
+    /* خلفية المكعبات والأشكال المتحركة */
+    .background-cubes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+      background: linear-gradient(135deg, #2c3e50, #7a96b3);
+    }
+    .cubes, .shapes {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .cubes .cube {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: floatCube linear infinite;
+    }
+    .cubes .cube:nth-child(1) {
+      left: 5%;
+      animation-duration: 10s;
+      animation-delay: 0s;
+    }
+    .cubes .cube:nth-child(2) {
+      left: 20%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+    }
+    .cubes .cube:nth-child(3) {
+      left: 40%;
+      animation-duration: 8s;
+      animation-delay: 1s;
+    }
+    .cubes .cube:nth-child(4) {
+      left: 60%;
+      animation-duration: 11s;
+      animation-delay: 3s;
+    }
+    .cubes .cube:nth-child(5) {
+      left: 80%;
+      animation-duration: 9s;
+      animation-delay: 0.5s;
+    }
+    .cubes .cube:nth-child(6) {
+      left: 35%;
+      animation-duration: 10s;
+      animation-delay: 4s;
+    }
+    .cubes .cube:nth-child(7) {
+      left: 55%;
+      animation-duration: 12s;
+      animation-delay: 1.5s;
+    }
+    .cubes .cube:nth-child(8) {
+      left: 75%;
+      animation-duration: 8s;
+      animation-delay: 2.5s;
+    }
+    @keyframes floatCube {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-10vh) rotate(360deg);
+      }
+    }
+    .shapes .shape {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      animation: floatShape linear infinite;
+    }
+    .shapes .shape:nth-child(1) {
+      left: 15%;
+      animation-duration: 14s;
+      animation-delay: 0s;
+    }
+    .shapes .shape:nth-child(2) {
+      left: 65%;
+      animation-duration: 16s;
+      animation-delay: 2s;
+    }
+    @keyframes floatShape {
+      0% {
+        transform: translateY(100vh) scale(0.5);
+      }
+      100% {
+        transform: translateY(-10vh) scale(1.2);
+      }
+    }
+
+    /* باقي التنسيقات للموقع */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: 'Segoe UI', sans-serif;
     }
-    /* إعلان البداية - تصميم حديث */
+    /* إعلان البداية */
     .ad-overlay {
       position: fixed;
       top: 5%;
@@ -81,7 +181,6 @@
       align-items: center;
     }
     .slide img {
-      /* لضمان عرض الصورة كاملة بدون قص */
       width: auto;
       height: auto;
       max-width: 100%;
@@ -124,10 +223,10 @@
     .header {
       text-align: center;
       padding: 10px 30px;
-      background: linear-gradient(135deg, #7a96b3, #2c7670);
+      background: linear-gradient(135deg, #7a96b300, #2c767000);
     }
     .header h1 {
-      color: #2c3e50;
+      color: #adc1d4;
       font-size: 2.8em;
       margin-bottom: 30px;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
@@ -155,8 +254,9 @@
     }
     .schedule-box p {
       margin-bottom: 10px;
+      transition: opacity 0.3s ease;
     }
-    /* عناصر التحكم داخل كل بطاقة */
+    /* عناصر التحكم */
     .controls {
       margin-top: 15px;
     }
@@ -169,29 +269,64 @@
       color: #fff;
       cursor: pointer;
       font-size: 14px;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
     }
     .controls button:hover {
       background: #256e63;
     }
-    /* سيتم تطبيق وظيفة "المزيد" على العناصر داخل .appointments */
-    .appointments p {
-      margin-bottom: 10px;
+    /* محتوى قابل للطي */
+    .appointments {
+      max-height: 200px;
+      overflow-y: auto;
+      transition: max-height 0.3s ease;
+    }
+    .appointments.collapsed {
+      max-height: 100px;
+    }
+    /* شريط التمرير */
+    .appointments::-webkit-scrollbar {
+      width: 8px;
+    }
+    .appointments::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    .appointments::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    .appointments::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    /* تأثيرات السهم */
+    .more-icon {
+      transition: transform 0.3s ease;
+      display: inline-block;
+    }
+    .more-btn.active .more-icon {
+      transform: rotate(180deg);
     }
     /* مربع البحث */
     .search-container {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      margin-top: 0;
+      padding: 0 10px;
+    }
+    .search-container.active {
+      max-height: 100px;
+      opacity: 1;
       margin-top: 10px;
       padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      display: none;
     }
     .search-container input {
-      width: 80%;
+      width: 100%;
       padding: 8px;
-      margin-right: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      margin-bottom: 10px;
     }
     @media (max-width: 768px) {
       .slideshow-container {
@@ -204,6 +339,24 @@
   </style>
 </head>
 <body>
+  <!-- خلفية المكعبات والأشكال -->
+  <div class="background-cubes">
+    <div class="cubes">
+      <div class="cube"></div>
+      <div class="cube"></div>
+      <div class="cube"></div>
+      <div class="cube"></div>
+      <div class="cube"></div>
+      <div class="cube"></div>
+      <div class="cube"></div>
+      <div class="cube"></div>
+    </div>
+    <div class="shapes">
+      <div class="shape"></div>
+      <div class="shape"></div>
+    </div>
+  </div>
+
   <!-- إعلان البداية -->
   <div class="ad-overlay" id="adOverlay">
     <div class="close-btn" onclick="closeAd()">✕</div>
@@ -229,62 +382,68 @@
 
   <!-- محتوى الموقع -->
   <header class="header">
-    <h1>مواعيد الخدمات الكنسية</h1>
+    <h1>المناسبات و المواعيد الكنسية</h1>
   </header>
+  
   <div class="schedule-container">
-    <!-- البطاقة الأولى: قداسات الأسبوع -->
+    <!-- البطاقة الأولى -->
     <div class="schedule-box">
       <h2>⛪ قداسات الأسبوع:</h2>
-      <div class="appointments">
+      <div class="appointments collapsed">
         <p>القداسات اليومية: 8 ص - 10 ص</p>
         <p>القداسة الأسبوعية: الجمعة 6 م</p>
-        <p>القداسات اليومية: 8 ص - 10 ص</p>
-        <p>القداسة الأسبوعية: الجمعة 6 م</p>
-        <p>موعد إضافي 1</p>
-        <p>موعد إضافي 2</p>
+        <p>قداسات الأعياد: حسب الإعلان</p>
+        <p>قداسات خاصة: الأربعاء 5 م</p>
+        <p>اجتماعات الصباح: 6 ص</p>
+        <p>قداسات الشباب: السبت 8 م</p>
+        <p>قداسات الأطفال: الأحد 4 م</p>
       </div>
       <div class="controls">
         <button class="more-btn">المزيد <span class="more-icon">▼</span></button>
-        <button class="search-btn">البحث <span class="search-icon">🔍</span></button>
+        <button class="search-btn">البحث 🔍</button>
       </div>
       <div class="search-container">
-        <input type="text" placeholder="ابحث باسم الخدمة واليوم والساعة">
-        <button class="do-search">ابحث</button>
+        <input type="text" placeholder="ابحث باسم الخدمة، اليوم، أو الوقت...">
       </div>
     </div>
-    <!-- البطاقة الثانية: مواعيد عاشيه -->
+
+    <!-- البطاقة الثانية -->
     <div class="schedule-box">
       <h2>⛪ مواعيد عاشيه:</h2>
-      <div class="appointments">
+      <div class="appointments collapsed">
         <p>يوم الاتنين الساعة 7م</p>
-        <p>موعد إضافي 3</p>
-        <p>موعد إضافي 4</p>
+        <p>اجتماعات خاصة: الخميس 8 م</p>
+        <p>اجتماعات الشباب: السبت 9 م</p>
+        <p>اجتماعات الصباح: 6 ص</p>
+        <p>اجتماعات المساء: 8 م</p>
+        <p>اجتماعات الأعياد: حسب الإعلان</p>
       </div>
       <div class="controls">
         <button class="more-btn">المزيد <span class="more-icon">▼</span></button>
-        <button class="search-btn">البحث <span class="search-icon">🔍</span></button>
+        <button class="search-btn">البحث 🔍</button>
       </div>
       <div class="search-container">
-        <input type="text" placeholder="ابحث باسم الخدمة واليوم والساعة">
-        <button class="do-search">ابحث</button>
+        <input type="text" placeholder="ابحث باسم الخدمة، اليوم، أو الوقت...">
       </div>
     </div>
-    <!-- البطاقة الثالثة: مواعيد الالحان -->
+
+    <!-- البطاقة الثالثة -->
     <div class="schedule-box">
       <h2>🎵 مواعيد الالحان:</h2>
-      <div class="appointments">
+      <div class="appointments collapsed">
         <p>البنات: السبت 4 م</p>
         <p>الشباب: الأحد 7 م</p>
-        <p>موعد إضافي 5</p>
-        <p>موعد إضافي 6</p>
+        <p>تدريبات خاصة: الثلاثاء 5 م</p>
+        <p>حفلات ترانيم: آخر كل شهر</p>
+        <p>ورش عمل: الأربعاء 6 م</p>
+        <p>عروض خاصة: حسب الإعلان</p>
       </div>
       <div class="controls">
         <button class="more-btn">المزيد <span class="more-icon">▼</span></button>
-        <button class="search-btn">البحث <span class="search-icon">🔍</span></button>
+        <button class="search-btn">البحث 🔍</button>
       </div>
       <div class="search-container">
-        <input type="text" placeholder="ابحث باسم الخدمة واليوم والساعة">
-        <button class="do-search">ابحث</button>
+        <input type="text" placeholder="ابحث باسم الخدمة، اليوم، أو الوقت...">
       </div>
     </div>
   </div>
@@ -297,6 +456,7 @@
     const sliderTrack = document.getElementById('sliderTrack');
     let touchStartX = 0;
     let autoSlideInterval;
+
     function initSlider() {
       slides.forEach((slide, index) => {
         const angle = index * 120;
@@ -305,23 +465,27 @@
       updateDots();
       startAutoSlide();
     }
+
     function startAutoSlide() {
       autoSlideInterval = setInterval(() => {
         currentIndex = (currentIndex + 1) % slides.length;
         rotateSlider();
       }, 3000);
     }
+
     function rotateSlider() {
       const angle = currentIndex * -120;
       sliderTrack.style.transform = `rotateY(${angle}deg)`;
       updateDots();
     }
+
     function updateDots() {
       dots.forEach(dot => {
         dot.classList.remove('active');
       });
       dots[currentIndex].classList.add('active');
     }
+
     dots.forEach(dot => {
       dot.addEventListener('click', () => {
         clearInterval(autoSlideInterval);
@@ -330,10 +494,12 @@
         startAutoSlide();
       });
     });
+
     sliderTrack.addEventListener('touchstart', e => {
       touchStartX = e.touches[0].clientX;
       clearInterval(autoSlideInterval);
     });
+
     sliderTrack.addEventListener('touchend', e => {
       const touchEndX = e.changedTouches[0].clientX;
       const diff = touchStartX - touchEndX;
@@ -343,69 +509,61 @@
       }
       startAutoSlide();
     });
+
     function closeAd() {
       document.getElementById('adOverlay').style.display = 'none';
       clearInterval(autoSlideInterval);
     }
-    initSlider();
 
-    // Functionality for "المزيد" and search in schedule boxes
+    // Schedule boxes functionality
     document.querySelectorAll('.schedule-box').forEach(box => {
       const moreBtn = box.querySelector('.more-btn');
-      const appointments = box.querySelectorAll('.appointments p');
-      // إخفاء جميع المواعيد بعد العنصرين الأولين
-      appointments.forEach((p, index) => {
-        if(index >= 2) {
-          p.style.display = 'none';
-        }
-      });
-      moreBtn.addEventListener('click', () => {
-        // التحقق من حالة العنصر الثالث (إذا كان مخفيًا أم لا)
-        if(appointments[2] && (appointments[2].style.display === 'none' || appointments[2].style.display === '')) {
-          appointments.forEach((p, index) => {
-            if(index >= 2) {
-              p.style.display = 'block';
-            }
-          });
-          moreBtn.querySelector('.more-icon').textContent = '▲';
-        } else {
-          appointments.forEach((p, index) => {
-            if(index >= 2) {
-              p.style.display = 'none';
-            }
-          });
-          moreBtn.querySelector('.more-icon').textContent = '▼';
-        }
-      });
+      const appointments = box.querySelector('.appointments');
+      const allItems = box.querySelectorAll('.appointments p');
       const searchBtn = box.querySelector('.search-btn');
       const searchContainer = box.querySelector('.search-container');
+      const searchInput = searchContainer.querySelector('input');
+
+      let isExpanded = false;
+
+      // زر المزيد
+      moreBtn.addEventListener('click', () => {
+        isExpanded = !isExpanded;
+        appointments.classList.toggle('collapsed');
+        moreBtn.classList.toggle('active');
+      });
+
+      // زر البحث
       searchBtn.addEventListener('click', () => {
-        if(searchContainer.style.display === 'none' || searchContainer.style.display === '') {
-          searchContainer.style.display = 'block';
-        } else {
-          searchContainer.style.display = 'none';
-          // إعادة عرض جميع المواعيد عند إخفاء البحث
-          appointments.forEach((p, index) => {
-            if(index >= 2) {
-              p.style.display = 'none';
-            }
+        searchContainer.classList.toggle('active');
+        if (!searchContainer.classList.contains('active')) {
+          searchInput.value = '';
+          allItems.forEach(item => {
+            item.style.display = 'block';
+            item.style.opacity = '1';
           });
-          // إعادة تفريغ حقل البحث
-          searchContainer.querySelector('input').value = '';
         }
       });
-      const searchInput = searchContainer.querySelector('input');
-      searchInput.addEventListener('input', () => {
-        const query = searchInput.value.trim().toLowerCase();
-        appointments.forEach(p => {
-          if(p.textContent.toLowerCase().includes(query)) {
-            p.style.display = 'block';
+
+      // فلترة النتائج
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        allItems.forEach(item => {
+          const text = item.textContent.toLowerCase();
+          if (text.includes(query)) {
+            item.style.display = 'block';
+            item.style.opacity = '1';
           } else {
-            p.style.display = 'none';
+            item.style.opacity = '0';
+            setTimeout(() => {
+              item.style.display = 'none';
+            }, 300);
           }
         });
       });
     });
+
+    initSlider();
   </script>
 </body>
 </html>
