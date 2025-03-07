@@ -1,87 +1,50 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>نظام إدارة الطلبات</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
 
 <style>
-
 :root {
-
---primary-color: #2E86C1;
-
---secondary-color: #F4F6F7;
-
---text-color: #2C3E50;
-
---error-color: #E74C3C;
-
---success-color: #28a745;
-
---card-bg: #FFFFFF;
-
---shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
+  --primary-color: #2E86C1;
+  --secondary-color: #F4F6F7;
+  --text-color: #2C3E50;
+  --error-color: #E74C3C;
+  --success-color: #28a745;
+  --card-bg: #FFFFFF;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-
-font-family: 'Cairo', sans-serif;
-
-background: var(--secondary-color);
-
-color: var(--text-color);
-
-line-height: 1.6;
-
+  font-family: 'Cairo', sans-serif;
+  background: var(--secondary-color);
+  color: var(--text-color);
+  line-height: 1.6;
 }
 
 .container {
-
-max-width: 800px;
-
-margin: 2rem auto;
-
-padding: 0 1rem;
-
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }
 
 .auth-card {
-
-background: var(--card-bg);
-
-border-radius: 1rem;
-
-box-shadow: var(--shadow);
-
-padding: 2.5rem;
-
-max-width: 480px;
-
-margin: 5rem auto;
-
-transition: transform 0.3s ease;
-
-text-align: center;
-
+  background: var(--card-bg);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  padding: 2.5rem;
+  max-width: 480px;
+  margin: 5rem auto;
+  transition: transform 0.3s ease;
+  text-align: center;
 }
 
 .auth-card:hover { transform: translateY(-5px); }
@@ -89,751 +52,454 @@ text-align: center;
 .auth-header { margin-bottom: 2rem; }
 
 .auth-header h2 {
-
-color: var(--primary-color);
-
-font-size: 1.8rem;
-
-margin-bottom: 0.5rem;
-
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
 }
 
 .input-group {
-
-margin-bottom: 1.5rem;
-
-position: relative;
-
+  margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .input-group input {
-
-width: 100%;
-
-padding: 1rem 1rem 1rem 40px;
-
-border: 2px solid #e0e0e0;
-
-border-radius: 0.5rem;
-
-font-size: 1rem;
-
-transition: border-color 0.3s ease;
-
+  width: 100%;
+  padding: 1rem 1rem 1rem 40px;
+  border: 2px solid #e0e0e0;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
 }
 
 .input-group input:focus { border-color: var(--primary-color); outline: none; }
 
 .input-group .toggle-password {
-
-position: absolute;
-
-left: 10px;
-
-top: 50%;
-
-transform: translateY(-50%);
-
-cursor: pointer;
-
-color: var(--primary-color);
-
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--primary-color);
 }
 
 .btn-primary {
-
-width: 100%;
-
-padding: 1rem;
-
-background: linear-gradient(135deg, var(--primary-color), #6AA9FF);
-
-color: white;
-
-border: none;
-
-border-radius: 0.5rem;
-
-font-size: 1.1rem;
-
-font-weight: 600;
-
-cursor: pointer;
-
-transition: transform 0.2s, box-shadow 0.2s;
-
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--primary-color), #6AA9FF);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .btn-primary:hover {
-
-transform: translateY(-2px);
-
-box-shadow: 0 5px 15px rgba(46, 134, 193, 0.3);
-
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(46, 134, 193, 0.3);
 }
 
 .orders-header {
-
-display: flex;
-
-justify-content: space-between;
-
-align-items: center;
-
-margin-bottom: 2rem;
-
-padding: 1rem 0;
-
-border-bottom: 2px solid #eee;
-
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+  border-bottom: 2px solid #eee;
 }
 
 .orders-list {
-
-display: flex;
-
-flex-direction: column;
-
-gap: 1rem;
-
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .order-card {
-
-background: var(--card-bg);
-
-border-radius: 1rem;
-
-padding: 1.5rem;
-
-box-shadow: var(--shadow);
-
-transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-border-left: 4px solid var(--primary-color);
-
-position: relative;
-
-overflow: hidden;
-
-animation: fadeInUp 0.5s ease;
-
+  background: var(--card-bg);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-left: 4px solid var(--primary-color);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease;
 }
 
 .order-card:hover {
-
-transform: translateY(-3px);
-
-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .order-summary {
-
-display: flex;
-
-justify-content: space-between;
-
-align-items: center;
-
-cursor: pointer;
-
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
 }
 
 .order-summary h3 {
-
-color: var(--primary-color);
-
-font-size: 1.2rem;
-
+  color: var(--primary-color);
+  font-size: 1.2rem;
 }
 
 .order-summary .arrow {
-
-font-size: 1.2rem;
-
-transition: transform 0.3s ease;
-
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
 }
 
 .order-details {
-
-max-height: 0;
-
-overflow: hidden;
-
-transition: max-height 0.3s ease, padding 0.3s ease;
-
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
 }
 
 .order-details.open {
-
-max-height: 600px;
-
-padding-top: 1rem;
-
+  max-height: 600px;
+  padding-top: 1rem;
 }
 
 .order-field {
-
-margin-bottom: 1rem;
-
-padding: 0.4rem 0;
-
-border-bottom: 1px solid #f0f0f0;
-
+  margin-bottom: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .order-field strong {
-
-color: var(--primary-color);
-
-display: block;
-
-margin-bottom: 0.3rem;
-
-font-size: 0.9rem;
-
+  color: var(--primary-color);
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
 }
 
 .empty-state {
-
-text-align: center;
-
-padding: 4rem;
-
-background: var(--card-bg);
-
-border-radius: 1rem;
-
-box-shadow: var(--shadow);
-
+  text-align: center;
+  padding: 4rem;
+  background: var(--card-bg);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
 }
 
 .alert {
-
-position: fixed;
-
-top: 20px;
-
-left: 50%;
-
-transform: translateX(-50%);
-
-padding: 1rem 2rem;
-
-border-radius: 8px;
-
-box-shadow: var(--shadow);
-
-opacity: 0;
-
-transition: opacity 0.5s ease-in-out;
-
-z-index: 1000;
-
-pointer-events: none;
-
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  z-index: 1000;
+  pointer-events: none;
 }
 
 .alert.show {
-
-opacity: 1;
-
-pointer-events: auto;
-
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .alert.error {
-
-background-color: var(--error-color);
-
-color: #fff;
-
-animation: shake 0.5s;
-
+  background-color: var(--error-color);
+  color: #fff;
+  animation: shake 0.5s;
 }
 
 .alert.success {
-
-background-color: var(--success-color);
-
-color: #fff;
-
+  background-color: var(--success-color);
+  color: #fff;
 }
 
 .delete-btn {
-
-background: var(--error-color);
-
-color: white;
-
-border: none;
-
-padding: 0.8rem 1.5rem;
-
-border-radius: 0.5rem;
-
-margin-top: 1rem;
-
-cursor: pointer;
-
-display: flex;
-
-align-items: center;
-
-gap: 0.5rem;
-
-font-family: 'Cairo', sans-serif;
-
-transition: background 0.3s ease;
-
-float: left;
-
+  background: var(--error-color);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Cairo', sans-serif;
+  transition: background 0.3s ease;
+  float: left;
 }
 
 .delete-btn:hover {
-
-background: #c0392b;
-
+  background: #c0392b;
 }
 
 @keyframes shake {
-
-0% { transform: translateX(-50%) translateX(0); }
-
-10% { transform: translateX(-50%) translateX(-10px); }
-
-20% { transform: translateX(-50%) translateX(10px); }
-
-30% { transform: translateX(-50%) translateX(-10px); }
-
-40% { transform: translateX(-50%) translateX(10px); }
-
-50% { transform: translateX(-50%) translateX(-10px); }
-
-60% { transform: translateX(-50%) translateX(10px); }
-
-70% { transform: translateX(-50%) translateX(-10px); }
-
-80% { transform: translateX(-50%) translateX(10px); }
-
-90% { transform: translateX(-50%) translateX(-10px); }
-
-100% { transform: translateX(-50%) translateX(0); }
-
+  0% { transform: translateX(-50%) translateX(0); }
+  10% { transform: translateX(-50%) translateX(-10px); }
+  20% { transform: translateX(-50%) translateX(10px); }
+  30% { transform: translateX(-50%) translateX(-10px); }
+  40% { transform: translateX(-50%) translateX(10px); }
+  50% { transform: translateX(-50%) translateX(-10px); }
+  60% { transform: translateX(-50%) translateX(10px); }
+  70% { transform: translateX(-50%) translateX(-10px); }
+  80% { transform: translateX(-50%) translateX(10px); }
+  90% { transform: translateX(-50%) translateX(-10px); }
+  100% { transform: translateX(-50%) translateX(0); }
 }
 
 @media (max-width: 768px) {
-
-.container { padding: 0 1rem; }
-
-.auth-card { margin: 2rem auto; padding: 1.5rem; }
-
-.orders-header { flex-direction: column; align-items: flex-start; }
-
+  .container { padding: 0 1rem; }
+  .auth-card { margin: 2rem auto; padding: 1.5rem; }
+  .orders-header { flex-direction: column; align-items: flex-start; }
 }
 
 @keyframes fadeInUp {
-
-from { opacity: 0; transform: translateY(20px); }
-
-to { opacity: 1; transform: translateY(0); }
-
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 </style>
-
 </head>
 
 <body>
-
 <div class="container">
+  <div class="auth-card" id="login-container">
+    <div class="auth-header">
+      <h2>مرحبًا بك في نظام الإدارة</h2>
+      <p>الرجاء إدخال كلمة المرور للوصول</p>
+    </div>
+    <p id="order-count" style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary-color);">
+      عدد الطلبات الحالية: <span id="count">0</span>
+    </p>
+    <div class="alert" id="error-message"></div>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="كلمة المرور" autocomplete="current-password">
+      <span class="toggle-password" onclick="togglePasswordVisibility()">
+        <i class="fas fa-eye"></i>
+      </span>
+    </div>
+    <button class="btn-primary" id="login-button">دخول إلى لوحة التحكم</button>
+  </div>
 
-<div class="auth-card" id="login-container">
-
-<div class="auth-header">
-
-<h2>مرحبًا بك في نظام الإدارة</h2>
-
-<p>الرجاء إدخال كلمة المرور للوصول</p>
-
+  <div id="order-container" style="display:none;">
+    <div class="orders-header">
+      <h2>الطلبات المقدمة</h2>
+      <button class="btn-primary" onclick="location.reload()">تحديث البيانات</button>
+    </div>
+    <div class="orders-list" id="orders"></div>
+  </div>
 </div>
-
-<p id="order-count" style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--primary-color);">
-
-عدد الطلبات الحالية: <span id="count">0</span>
-
-</p>
-
-<div class="alert" id="error-message"></div>
-
-<div class="input-group">
-
-<input type="password" id="password" placeholder="كلمة المرور" autocomplete="current-password">
-
-<span class="toggle-password" onclick="togglePasswordVisibility()">
-
-<i class="fas fa-eye"></i>
-
-</span>
-
-</div>
-
-<button class="btn-primary" id="login-button">دخول إلى لوحة التحكم</button>
-
-</div>
-
-<div id="order-container" style="display:none;">
-
-<div class="orders-header">
-
-<h2>الطلبات المقدمة</h2>
-
-<button class="btn-primary" onclick="location.reload()">تحديث البيانات</button>
-
-</div>
-
-<div class="orders-list" id="orders"></div>
-
-</div>
-
-</div>
-
-<!-- صوت الحذف -->
 
 <audio id="delete-sound" src="https://cdn.pixabay.com/download/audio/2022/11/14/audio_5a6c0c3a2a.mp3"></audio>
 
 <script>
-
 const firebaseConfig = {
-
-apiKey: "AIzaSyD4NiKlU6SIJVxbnbk60SkRt8BNqlonk-U",
-
-authDomain: "mina-project-c10b2.firebaseapp.com",
-
-projectId: "mina-project-c10b2",
-
-storageBucket: "mina-project-c10b2.firebasestorage.app",
-
-messagingSenderId: "1088494592963",
-
-appId: "1:1088494592963:web:de6a787bc3b1694ccd1376"
-
+  apiKey: "AIzaSyD4NiKlU6SIJVxbnbk60SkRt8BNqlonk-U",
+  authDomain: "mina-project-c10b2.firebaseapp.com",
+  projectId: "mina-project-c10b2",
+  storageBucket: "mina-project-c10b2.appspot.com",
+  messagingSenderId: "1088494592963",
+  appId: "1:1088494592963:web:de6a787bc3b1694ccd1376"
 };
 
 firebase.initializeApp(firebaseConfig);
-
+const database = firebase.database();
 const messaging = firebase.messaging();
 
-messaging.usePublicVapidKey('BIr0VwRaBu2y2TPbs89jWg-DVpdW5czP_wWWnPucEb8Xs9MBW6Jjk9IhXEXCdhYE3zBIMCc0yLAokodRcjVCxCI');
-
-messaging.requestPermission()
-
-.then(() => messaging.getToken())
-
-.catch((err) => console.log('فشل الحصول على إذن الإشعارات:', err));
-
-messaging.onMessage((payload) => {
-
-if (Notification.permission === "granted") {
-
-new Notification(payload.notification.title, {
-
-body: payload.notification.body,
-
-icon: payload.notification.icon
-
-});
-
+// تسجيل Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('firebase-messaging-sw.js')
+    .then(registration => {
+      messaging.useServiceWorker(registration);
+    });
 }
-
-});
 
 let initialLoad = true;
-
-firebase.database().ref("orders").on("child_added", function() {
-
-if (!initialLoad && Notification.permission === "granted") {
-
-new Notification("طلب جديد", {
-
-body: "لقد وصل طلب جديد. يرجى التحقق من لوحة التحكم."
-
-});
-
-}
-
-});
-
 const loginButton = document.getElementById('login-button');
-
 const errorMessage = document.getElementById('error-message');
-
 const orderCountSpan = document.getElementById('count');
-
 let attemptCount = 0;
-
 const BAN_DURATION = 60000;
 
+// طلب إذن الإشعارات
+function requestNotificationPermission() {
+  Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+      getFCMToken();
+    }
+  });
+}
+
+// الحصول على FCM Token
+function getFCMToken() {
+  messaging.getToken({vapidKey: 'BIr0VwRaBu2y2TPbs89jWg-DVpdW5czP_wWWnPucEb8Xs9MBW6Jjk9IhXEXCdhYE3zBIMCc0yLAokodRcjVCxCI'})
+    .then(currentToken => {
+      if (currentToken) {
+        console.log('FCM Token:', currentToken);
+      }
+    })
+    .catch(err => console.log('خطأ في الحصول على التوكن:', err));
+}
+
+// عرض الإشعارات
+function showNotification(title, body) {
+  if (Notification.permission === "granted") {
+    new Notification(title, { 
+      body: body,
+      icon: 'notification-icon.png',
+      vibrate: [200, 100, 200]
+    });
+  }
+}
+
+// الاستماع للرسائل
+messaging.onMessage(payload => {
+  showNotification(payload.notification.title, payload.notification.body);
+});
+
+// التعامل مع الطلبات الجديدة
+database.ref("orders").on("child_added", snapshot => {
+  if (!initialLoad) {
+    const order = snapshot.val();
+    showNotification("طلب جديد 🎉", `طلب من ${order.leader} لخدمة ${order.serviceName}`);
+  }
+  initialLoad = false;
+  updateOrderCount();
+});
+
 function showMessage(message, type) {
-
-errorMessage.textContent = message;
-
-errorMessage.className = "alert show " + type;
-
-setTimeout(() => errorMessage.classList.remove("show"), 3000);
-
+  errorMessage.textContent = message;
+  errorMessage.className = "alert show " + type;
+  setTimeout(() => errorMessage.classList.remove("show"), 3000);
 }
 
 function checkBanStatus() {
-
-let bannedUntil = localStorage.getItem("bannedUntil");
-
-if (bannedUntil && Date.now() < parseInt(bannedUntil)) {
-
-loginButton.disabled = true;
-
-document.getElementById('password').disabled = true;
-
-setTimeout(() => {
-
-loginButton.disabled = false;
-
-document.getElementById('password').disabled = false;
-
-localStorage.removeItem("bannedUntil");
-
-attemptCount = 0;
-
-}, bannedUntil - Date.now());
-
+  let bannedUntil = localStorage.getItem("bannedUntil");
+  if (bannedUntil && Date.now() < parseInt(bannedUntil)) {
+    loginButton.disabled = true;
+    document.getElementById('password').disabled = true;
+    setTimeout(() => {
+      loginButton.disabled = false;
+      document.getElementById('password').disabled = false;
+      localStorage.removeItem("bannedUntil");
+      attemptCount = 0;
+    }, bannedUntil - Date.now());
+  }
 }
-
-}
-
-checkBanStatus();
 
 function updateOrderCount() {
-
-firebase.database().ref("orders").once("value").then(snapshot => {
-
-orderCountSpan.textContent = snapshot.numChildren();
-
-});
-
+  database.ref("orders").once("value").then(snapshot => {
+    orderCountSpan.textContent = snapshot.numChildren();
+  });
 }
-
-updateOrderCount();
 
 loginButton.addEventListener('click', function() {
-
-const password = document.getElementById('password').value.trim();
-
-if (password === '123') {
-
-document.getElementById('login-container').style.display = 'none';
-
-document.getElementById('order-container').style.display = 'block';
-
-loadOrders();
-
-} else {
-
-if (++attemptCount >= 3) {
-
-const banUntil = Date.now() + BAN_DURATION;
-
-localStorage.setItem("bannedUntil", banUntil);
-
-showMessage("تم حظرك لمدة دقيقة بسبب محاولات خاطئة", "error");
-
-loginButton.disabled = true;
-
-document.getElementById('password').disabled = true;
-
-setTimeout(() => {
-
-loginButton.disabled = false;
-
-document.getElementById('password').disabled = false;
-
-attemptCount = 0;
-
-}, BAN_DURATION);
-
-} else {
-
-showMessage("كلمة المرور غير صحيحة، الرجاء المحاولة مرة أخرى", "error");
-
-}
-
-}
-
+  const password = document.getElementById('password').value.trim();
+  if (password === '123') {
+    document.getElementById('login-container').style.display = 'none';
+    document.getElementById('order-container').style.display = 'block';
+    loadOrders();
+    requestNotificationPermission();
+  } else {
+    if (++attemptCount >= 3) {
+      const banUntil = Date.now() + BAN_DURATION;
+      localStorage.setItem("bannedUntil", banUntil);
+      showMessage("تم حظرك لمدة دقيقة بسبب محاولات خاطئة", "error");
+      loginButton.disabled = true;
+      document.getElementById('password').disabled = true;
+      setTimeout(() => {
+        loginButton.disabled = false;
+        document.getElementById('password').disabled = false;
+        attemptCount = 0;
+      }, BAN_DURATION);
+    } else {
+      showMessage("كلمة المرور غير صحيحة، الرجاء المحاولة مرة أخرى", "error");
+    }
+  }
 });
 
 function togglePasswordVisibility() {
-
-const passwordInput = document.getElementById('password');
-
-const toggleIcon = document.querySelector('.toggle-password i');
-
-passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-
-toggleIcon.classList.toggle('fa-eye-slash');
-
+  const passwordInput = document.getElementById('password');
+  const toggleIcon = document.querySelector('.toggle-password i');
+  passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+  toggleIcon.classList.toggle('fa-eye-slash');
 }
 
 function loadOrders() {
-
-const ordersDiv = document.getElementById('orders');
-
-firebase.database().ref("orders").on("value", snapshot => {
-
-if (!snapshot.exists()) {
-
-ordersDiv.innerHTML = `
-
-<div class="empty-state">
-
-<h3>لا يوجد طلبات حالية</h3>
-
-<p>سيظهر هنا أي طلبات جديدة يتم تقديمها</p>
-
-</div>`;
-
-} else {
-
-ordersDiv.innerHTML = '';
-
-snapshot.forEach(childSnapshot => {
-
-const order = childSnapshot.val();
-
-const orderKey = childSnapshot.key;
-
-const orderCard = document.createElement('div');
-
-orderCard.className = 'order-card';
-
-orderCard.setAttribute('data-key', orderKey);
-
-orderCard.innerHTML = `
-
-<div class="order-summary" onclick="toggleDetails(this)">
-
-<h3>طلب من: ${order.leader}</h3>
-
-<span class="arrow"><i class="fas fa-chevron-down"></i></span>
-
-</div>
-
-<div class="order-details">
-
-<div class="order-field">
-
-<strong>اسم الخدمة</strong>
-
-${order.serviceName}
-
-</div>
-
-<div class="order-field">
-
-<strong>المكان</strong>
-
-${order.location}
-
-</div>
-
-<div class="order-field">
-
-<strong>رقم التواصل</strong>
-
-${order.whatsapp}
-
-</div>
-
-<div class="order-field">
-
-<strong>التوقيت</strong>
-
-${order.day} - ${order.time}
-
-</div>
-
-<div class="order-field">
-
-<strong>الإضافات</strong>
-
-${order.equipment?.length ? order.equipment.join('، ') : 'لا يوجد'}
-
-</div>
-
-<div class="order-field">
-
-<strong>ملاحظات</strong>
-
-${order.other || 'لا يوجد'}
-
-</div>
-
-<button class="delete-btn" onclick="deleteOrder('${orderKey}')">
-
-<i class="fas fa-trash"></i>
-
-حذف الطلب
-
-</button>
-
-</div>
-
-`;
-
-ordersDiv.appendChild(orderCard);
-
-});
-
-}
-
-updateOrderCount();
-
-});
-
+  const ordersDiv = document.getElementById('orders');
+  database.ref("orders").on("value", snapshot => {
+    if (!snapshot.exists()) {
+      ordersDiv.innerHTML = `
+        <div class="empty-state">
+          <h3>لا يوجد طلبات حالية</h3>
+          <p>سيظهر هنا أي طلبات جديدة يتم تقديمها</p>
+        </div>`;
+    } else {
+      ordersDiv.innerHTML = '';
+      snapshot.forEach(childSnapshot => {
+        const order = childSnapshot.val();
+        const orderKey = childSnapshot.key;
+        const orderCard = document.createElement('div');
+        orderCard.className = 'order-card';
+        orderCard.setAttribute('data-key', orderKey);
+        orderCard.innerHTML = `
+          <div class="order-summary" onclick="toggleDetails(this)">
+            <h3>طلب من: ${order.leader}</h3>
+            <span class="arrow"><i class="fas fa-chevron-down"></i></span>
+          </div>
+          <div class="order-details">
+            <div class="order-field">
+              <strong>اسم الخدمة</strong>
+              ${order.serviceName}
+            </div>
+            <div class="order-field">
+              <strong>المكان</strong>
+              ${order.location}
+            </div>
+            <div class="order-field">
+              <strong>رقم التواصل</strong>
+              ${order.whatsapp}
+            </div>
+            <div class="order-field">
+              <strong>التوقيت</strong>
+              ${order.day} - ${order.time}
+            </div>
+            <div class="order-field">
+              <strong>الإضافات</strong>
+              ${order.equipment?.length ? order.equipment.join('، ') : 'لا يوجد'}
+            </div>
+            <div class="order-field">
+              <strong>ملاحظات</strong>
+              ${order.other || 'لا يوجد'}
+            </div>
+            <button class="delete-btn" onclick="deleteOrder('${orderKey}')">
+              <i class="fas fa-trash"></i>
+              حذف الطلب
+            </button>
+          </div>`;
+        ordersDiv.appendChild(orderCard);
+      });
+    }
+    updateOrderCount();
+  });
 }
 
 function toggleDetails(element) {
-
-const details = element.nextElementSibling;
-
-const arrowIcon = element.querySelector('.arrow i');
-
-details.classList.toggle('open');
-
-arrowIcon.style.transform = details.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-
+  const details = element.nextElementSibling;
+  const arrowIcon = element.querySelector('.arrow i');
+  details.classList.toggle('open');
+  arrowIcon.style.transform = details.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
 }
 
 function deleteOrder(orderKey) {
-
-if (confirm('هل أنت متأكد من رغبتك في حذف هذا الطلب؟')) {
-
-const deleteSound = document.getElementById('delete-sound');
-
-deleteSound.play();
-
-firebase.database().ref("orders/" + orderKey).remove()
-
-.then(() => showMessage('تم حذف الطلب بنجاح', 'success'))
-
-.catch(() => showMessage('حدث خطأ أثناء الحذف', 'error'));
-
+  if (confirm('هل أنت متأكد من رغبتك في حذف هذا الطلب؟')) {
+    const deleteSound = document.getElementById('delete-sound');
+    deleteSound.play();
+    database.ref("orders/" + orderKey).remove()
+      .then(() => showMessage('تم حذف الطلب بنجاح', 'success'))
+      .catch(() => showMessage('حدث خطأ أثناء الحذف', 'error'));
+  }
 }
 
-}
-
+checkBanStatus();
+updateOrderCount();
 </script>
-
 </body>
-
 </html>
