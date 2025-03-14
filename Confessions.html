@@ -30,10 +30,10 @@
       zoom: 0.80; /* تكبير الصفحة بنسبة 80% */
     }
     
-    /* هيدر الصفحة المعدل */
+    /* هيدر الصفحة */
     .header {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      padding: 1rem; /* تصغير حجم الهيدر */
+      padding: 1rem;
       position: relative;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       display: flex;
@@ -42,20 +42,18 @@
       justify-content: center;
     }
     
-    /* الاقتباس في الهيدر على الشمال، بخط أكبر وتحت بعض */
     .header-quote {
       position: absolute;
       top: 35%;
       left: 20px;
       transform: translateY(-50%);
       font-size: 1.4rem;
-      color:#f3cbcb;
+      color: #f3cbcb;
       max-width: 300px;
       line-height: 1.3;
       text-align: left;
     }
     
-    /* أشكال زخرفية في الهيدر */
     .shape {
       position: absolute;
       top: 0;
@@ -77,24 +75,22 @@
       opacity: 0.5;
     }
     
-    /* محتوى الهيدر (اللوجو والاسم) */
     .header-content {
       display: flex;
       flex-direction: column;
       width: 100%;
     }
     .logo {
-      max-width: 140px; /* تصغير اللوجو */
+      max-width: 140px;
       margin-bottom: 0.5rem;
       align-self: flex-end;
       margin-left: 70%;
     }
     .site-title {
-      font-size: 2rem; /* تصغير حجم الاسم */
+      font-size: 2rem;
       color: #f3cbcb;
     }
     
-    /* حاوية البطاقات */
     .container {
       max-width: 1300px;
       margin: 3rem auto;
@@ -104,7 +100,6 @@
       gap: 2rem;
     }
     
-    /* تصميم البطاقة */
     .card {
       background: var(--card-bg);
       border-radius: 20px;
@@ -117,7 +112,6 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
     
-    /* تكبير الصورة والاسم عند تحويم البطاقة (مع الدائرة والأيقونات) */
     .card:hover .priest-photo,
     .card:hover .priest-name,
     .card:hover .photo-container::before,
@@ -126,7 +120,6 @@
       transition: transform 0.3s ease;
     }
     
-    /* رأس البطاقة */
     .card-header {
       padding: 1.5rem;
       background: var(--primary-color);
@@ -140,12 +133,10 @@
       gap: 2rem;
     }
     
-    /* تغليف الصورة داخل حاوية لإضافة الدائرة والأيقونات */
     .photo-container {
       position: relative;
       display: inline-block;
     }
-    /* الدائرة الخلفية للصورة باستخدام pseudo-element */
     .photo-container::before {
       content: "";
       position: absolute;
@@ -158,7 +149,6 @@
       z-index: 0;
       transition: transform 0.3s ease;
     }
-    /* الصورة مع إضافة ظل تحتها */
     .priest-photo {
       transform: translateX(45px);
       width: 200px;
@@ -171,7 +161,6 @@
       transition: transform 0.3s ease;
       box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
     }
-    /* الأيقونات الإضافية التي تتحرك مع الصورة */
     .extra-icon {
       position: absolute;
       color: #fff;
@@ -180,12 +169,10 @@
       transition: transform 0.3s ease, opacity 0.3s ease;
       opacity: 0.8;
     }
-    /* أيقونة الصليب */
     .cross-icon {
       top: 10%;
       left: 10%;
     }
-    /* أيقونة الزائد */
     .plus-icon {
       bottom: 10%;
       right: 10%;
@@ -203,7 +190,6 @@
       transition: transform 0.3s ease;
     }
     
-    /* زر التفاصيل */
     .toggle-details {
       position: absolute;
       bottom: 15px;
@@ -230,7 +216,6 @@
       transform: rotate(180deg);
     }
     
-    /* تفاصيل البطاقة */
     .card-details {
       max-height: 0;
       overflow: hidden;
@@ -270,7 +255,7 @@
     <div class="header-quote">
       "لاَ تَسْتَحِي أَنْ تَعْتَرِفَ بِخَطَايَاكَ،<br>
       وَلاَ تُغَالِبْ مَجْرَى النَّهْرِ" ...........<br>
-      (سفر يشوع بن سيراخ 4: 31) 
+      (سفر يشوع بن سيراخ 4: 31)
     </div>
     <div class="shape"></div>
     <div class="shape shape-2"></div>
@@ -286,7 +271,7 @@
       <div class="card-header">
         <div class="priest-info">
           <div class="photo-container">
-            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <img src="https://static.vecteezy.com/system/resources/previews/011/948/550/large_2x/photo-profile-icon-customer-white-contour-avatar-interface-thin-graphic-line-design-social-media-communication-and-correspondence-character-pictogram-visualization-vector.jpg" alt="ابونا ابانوب" class="priest-photo">
             <i class="fas fa-xmark extra-icon cross-icon"></i>
             <i class="fas fa-plus extra-icon plus-icon"></i>
           </div>
@@ -326,12 +311,12 @@
       </div>
     </div>
     
-    <!-- بطاقة ثانية -->
+    <!-- البطاقة الثانية -->
     <div class="card">
       <div class="card-header">
         <div class="priest-info">
           <div class="photo-container">
-            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <img src="https://static.vecteezy.com/system/resources/previews/011/948/550/large_2x/photo-profile-icon-customer-white-contour-avatar-interface-thin-graphic-line-design-social-media-communication-and-correspondence-character-pictogram-visualization-vector.jpg" alt="ابونا ابانوب" class="priest-photo">
             <i class="fas fa-xmark extra-icon cross-icon"></i>
             <i class="fas fa-plus extra-icon plus-icon"></i>
           </div>
@@ -371,11 +356,12 @@
       </div>
     </div>
     
+    <!-- البطاقة الثالثة -->
     <div class="card">
       <div class="card-header">
         <div class="priest-info">
           <div class="photo-container">
-            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <img src="https://static.vecteezy.com/system/resources/previews/011/948/550/large_2x/photo-profile-icon-customer-white-contour-avatar-interface-thin-graphic-line-design-social-media-communication-and-correspondence-character-pictogram-visualization-vector.jpg" alt="ابونا ابانوب" class="priest-photo">
             <i class="fas fa-xmark extra-icon cross-icon"></i>
             <i class="fas fa-plus extra-icon plus-icon"></i>
           </div>
@@ -415,11 +401,12 @@
       </div>
     </div>
     
+    <!-- البطاقة الرابعة -->
     <div class="card">
       <div class="card-header">
         <div class="priest-info">
           <div class="photo-container">
-            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <img src="https://static.vecteezy.com/system/resources/previews/011/948/550/large_2x/photo-profile-icon-customer-white-contour-avatar-interface-thin-graphic-line-design-social-media-communication-and-correspondence-character-pictogram-visualization-vector.jpg" alt="ابونا ابانوب" class="priest-photo">
             <i class="fas fa-xmark extra-icon cross-icon"></i>
             <i class="fas fa-plus extra-icon plus-icon"></i>
           </div>
@@ -459,11 +446,12 @@
       </div>
     </div>
     
+    <!-- البطاقة الخامسة -->
     <div class="card">
       <div class="card-header">
         <div class="priest-info">
           <div class="photo-container">
-            <img src="IMG-20241229-WA0014.jpg" alt="ابونا ابانوب" class="priest-photo">
+            <img src="https://static.vecteezy.com/system/resources/previews/011/948/550/large_2x/photo-profile-icon-customer-white-contour-avatar-interface-thin-graphic-line-design-social-media-communication-and-correspondence-character-pictogram-visualization-vector.jpg" alt="ابونا ابانوب" class="priest-photo">
             <i class="fas fa-xmark extra-icon cross-icon"></i>
             <i class="fas fa-plus extra-icon plus-icon"></i>
           </div>
@@ -505,6 +493,7 @@
     
   </main>
   
+  <!-- وظيفة تبديل التفاصيل -->
   <script>
     function toggleDetails(button) {
       const card = button.closest('.card');
@@ -513,6 +502,29 @@
       details.classList.toggle('expanded');
       arrow.classList.toggle('expanded');
     }
+  </script>
+  
+  <!-- نظام الحماية لمنع الفحص -->
+  <script>
+    // تعطيل النقر بزر الماوس الأيمن
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+    
+    // تعطيل اختصارات لوحة المفاتيح المستخدمة لفتح أدوات المطور
+    document.onkeydown = function(e) {
+      // منع F12
+      if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+      }
+      // منع Ctrl+Shift+I، Ctrl+Shift+J، و Ctrl+U
+      if ((e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+          (e.ctrlKey && e.keyCode === 85)) {
+        e.preventDefault();
+        return false;
+      }
+    };
   </script>
 </body>
 </html>
