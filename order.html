@@ -391,5 +391,30 @@
       document.getElementById('other-request').value = '';
     }
   </script>
+
+<!-- نظام الحماية لمنع الفحص -->
+ <script>
+  // تعطيل النقر بزر الماوس الأيمن
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+  
+  // تعطيل اختصارات لوحة المفاتيح المستخدمة لفتح أدوات المطور
+  document.onkeydown = function(e) {
+    // منع F12
+    if (e.keyCode === 123) {
+      e.preventDefault();
+      return false;
+    }
+    // منع Ctrl+Shift+I، Ctrl+Shift+J، و Ctrl+U
+    if ((e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+        (e.ctrlKey && e.keyCode === 85)) {
+      e.preventDefault();
+      return false;
+    }
+  };
+</script>
+
+  
 </body>
 </html>
